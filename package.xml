@@ -44,9 +44,8 @@
   <depend>helelani_common</depend>
   <depend>roscpp</depend>
   <depend>std_msgs</depend>
-  <depend>rqt</depend>
-  <depend>rviz</depend>
-  <depend>rqt_plot</depend>
+  <depend>rqt_gui_cpp</depend>
+  <depend>rqt_gui</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

@@ -5,7 +5,7 @@ project(helelani_client)
 add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
-find_package(catkin REQUIRED COMPONENTS rqt_gui rqt_gui_cpp rqt_plot)
+find_package(catkin REQUIRED COMPONENTS rqt_gui rqt_gui_cpp)
 find_package(Boost REQUIRED COMPONENTS system)
 
 ###################################
@@ -15,7 +15,7 @@ find_package(Boost REQUIRED COMPONENTS system)
 catkin_package(
   INCLUDE_DIRS src
   LIBRARIES helelani_client
-  CATKIN_DEPENDS roscpp std_msgs rqt rqt_plot rviz helelani_common
+  CATKIN_DEPENDS roscpp std_msgs rqt_gui_cpp helelani_common
 )
 
 ###########
@@ -26,11 +26,15 @@ set(CMAKE_AUTOMOC ON)
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
 set(QT_LIBRARIES Qt5::Widgets)
 
+set(WORKSPACE_INCLUDES "")
+foreach(f ${CATKIN_WORKSPACES})
+  list(APPEND WORKSPACE_INCLUDES "${f}/include")
+endforeach(f)
 include_directories(src
-                    ${CMAKE_BINARY_DIR}
+                    ${CMAKE_CURRENT_BINARY_DIR}
                     ${Boost_INCLUDE_DIRS}
                     ${catkin_INCLUDE_DIRS}
-                    ${CATKIN_WORKSPACES}/include)
+                    ${WORKSPACE_INCLUDES})
 
 QT5_WRAP_UI(UI_GENERATED_HEADERS src/HelelaniClient.ui)
 add_library(${PROJECT_NAME} ${UI_GENERATED_HEADERS} src/HelelaniClient.cpp src/HelelaniClient.h)
