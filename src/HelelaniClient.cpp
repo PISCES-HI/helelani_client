@@ -45,25 +45,9 @@ void HelelaniClient::restoreSettings(const qt_gui_cpp::Settings& plugin_settings
 
 void HelelaniClient::imuCallback(const helelani_common::Imu& message)
 {
-    geometry_msgs::Vector3 a;
-    a.x = message.accel.y;
-    a.y = -message.accel.z;
-    a.z = message.accel.x;
-
-    geometry_msgs::Vector3 m;
-    m.x = message.mag.y;
-    m.y = -message.mag.z;
-    m.z = message.mag.x;
-
-    const float roll = std::atan2(a.y, a.z);
-    const float pitch = std::atan2(-a.x, a.y * std::sin(roll) + a.z * std::cos(roll));
-    const float heading = std::atan2(m.z * std::sin(roll) - m.y * std::cos(roll),
-                                     m.x * std::cos(pitch) + m.y * std::sin(pitch) *
-                                     std::sin(roll) + m.z * std::sin(pitch) * std::cos(roll));
-
-    m_ui.pitchDisplay->display(pitch);
-    m_ui.rollDisplay->display(roll);
-    m_ui.headingDisplay->display(heading);
+    m_ui.pitchDisplay->display(message.pitch);
+    m_ui.rollDisplay->display(message.roll);
+    m_ui.headingDisplay->display(message.yaw);
 }
 
 }
