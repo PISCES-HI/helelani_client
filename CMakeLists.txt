@@ -23,8 +23,9 @@ catkin_package(
 ###########
 
 set(CMAKE_AUTOMOC ON)
-find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
-set(QT_LIBRARIES Qt5::Widgets)
+find_package(Qt4 COMPONENTS QtCore QtGui QtSvg REQUIRED)
+include(${QT_USE_FILE})
+set(QT_LIBRARIES ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTSVG_LIBRARY})
 
 set(WORKSPACE_INCLUDES "")
 foreach(f ${CATKIN_WORKSPACES})
@@ -36,8 +37,13 @@ include_directories(src
                     ${catkin_INCLUDE_DIRS}
                     ${WORKSPACE_INCLUDES})
 
-QT5_WRAP_UI(UI_GENERATED_HEADERS src/HelelaniClient.ui)
-add_library(${PROJECT_NAME} ${UI_GENERATED_HEADERS} src/HelelaniClient.cpp src/HelelaniClient.h)
+QT4_WRAP_UI(UI_GENERATED_HEADERS src/HelelaniIMU.ui)
+QT4_ADD_RESOURCES(RES_SOURCES resources/resources.qrc)
+add_library(${PROJECT_NAME} ${UI_GENERATED_HEADERS} ${RES_SOURCES}
+            src/HelelaniIMU.cpp src/HelelaniIMU.h
+            src/AttitudeWidget.cpp src/AttitudeWidget.h
+            src/HeadingWidget.cpp src/HeadingWidget.h
+            src/SVGHelper.h)
 
 ## Add cmake target dependencies of the library
 add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -49,9 +55,19 @@ target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${QT_LIBRARIES})
 ## Install ##
 #############
 
+catkin_python_setup()
+
 ## Mark executables and/or libraries for installation
 install(TARGETS ${PROJECT_NAME}
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(PROGRAMS scripts/helelani_imu
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(FILES plugin.xml
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )

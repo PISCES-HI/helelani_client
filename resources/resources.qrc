@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+    <qresource>
+        <file>Attitude_indicator_level_flight.svg</file>
+        <file>Heading_indicator.svg</file>
+    </qresource>
+</RCC>

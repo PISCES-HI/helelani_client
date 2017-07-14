@@ -1,0 +1,14 @@
+<library path="lib/libhelelani_client">
+    <class name="Helelani IMU" type="helelani_client::HelelaniIMU" base_class_type="rqt_gui_cpp::Plugin">
+        <description>Helelani IMU</description>
+        <qtgui>
+            <group>
+                <label>Helelani</label>
+                <icon type="theme">folder</icon>
+                <statustip>Plugins related to PISCES Helelani.</statustip>
+            </group>
+            <label>Helelani IMU</label>
+            <statustip>Helelani IMU</statustip>
+        </qtgui>
+    </class>
+</library>
