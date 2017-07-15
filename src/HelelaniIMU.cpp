@@ -1,20 +1,10 @@
 #include "HelelaniIMU.h"
-#include "ui_HelelaniClient.h"
 #include <pluginlib/class_list_macros.h>
 
 static void InitResources() { Q_INIT_RESOURCE(resources); }
 static void CleanupResources() { Q_CLEANUP_RESOURCE(resources); }
 
 namespace helelani_client {
-
-HelelaniIMU::HelelaniIMU()
-{
-}
-
-HelelaniIMU::~HelelaniIMU()
-{
-
-}
 
 void HelelaniIMU::initPlugin(qt_gui_cpp::PluginContext& context)
 {
@@ -26,7 +16,7 @@ void HelelaniIMU::initPlugin(qt_gui_cpp::PluginContext& context)
     m_widget = new QWidget();
     // extend the widget with all attributes and children from UI file
     m_ui.setupUi(m_widget);
-    m_widget->setObjectName("HelelaniClient");
+    m_widget->setObjectName("HelelaniIMU");
     if (context.serialNumber() > 1)
         m_widget->setWindowTitle(m_widget->windowTitle() +
                                  " (" + QString::number(context.serialNumber()) + ")");

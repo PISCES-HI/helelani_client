@@ -11,4 +11,16 @@
             <statustip>Helelani IMU</statustip>
         </qtgui>
     </class>
+    <class name="Helelani Command" type="helelani_client::HelelaniCommand" base_class_type="rqt_gui_cpp::Plugin">
+        <description>Helelani Command</description>
+        <qtgui>
+            <group>
+                <label>Helelani</label>
+                <icon type="theme">folder</icon>
+                <statustip>Plugins related to PISCES Helelani.</statustip>
+            </group>
+            <label>Helelani Command</label>
+            <statustip>Helelani Command</statustip>
+        </qtgui>
+    </class>
 </library>

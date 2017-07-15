@@ -37,12 +37,13 @@ include_directories(src
                     ${catkin_INCLUDE_DIRS}
                     ${WORKSPACE_INCLUDES})
 
-QT4_WRAP_UI(UI_GENERATED_HEADERS src/HelelaniIMU.ui)
+QT4_WRAP_UI(UI_GENERATED_HEADERS src/HelelaniIMU.ui src/HelelaniCommand.ui)
 QT4_ADD_RESOURCES(RES_SOURCES resources/resources.qrc)
 add_library(${PROJECT_NAME} ${UI_GENERATED_HEADERS} ${RES_SOURCES}
             src/HelelaniIMU.cpp src/HelelaniIMU.h
             src/AttitudeWidget.cpp src/AttitudeWidget.h
             src/HeadingWidget.cpp src/HeadingWidget.h
+            src/HelelaniCommand.cpp src/HelelaniCommand.h
             src/SVGHelper.h)
 
 ## Add cmake target dependencies of the library
@@ -64,7 +65,7 @@ install(TARGETS ${PROJECT_NAME}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(PROGRAMS scripts/helelani_imu
+install(PROGRAMS scripts/helelani_imu scripts/helelani_command
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
