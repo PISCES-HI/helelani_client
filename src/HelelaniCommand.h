@@ -339,7 +339,6 @@ public:
             QCompleter(model, parent)
     {
         setCaseSensitivity(Qt::CaseInsensitive);
-        setMaxVisibleItems(7);
         setCompletionMode(CompletionMode::UnfilteredPopupCompletion);
     }
     QStringList splitPath(const QString& path) const override
