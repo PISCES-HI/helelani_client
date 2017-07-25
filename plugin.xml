@@ -23,4 +23,28 @@
             <statustip>Helelani Command</statustip>
         </qtgui>
     </class>
+    <class name="Helelani IP Camera Viewer" type="helelani_client::HelelaniIPCamViewer" base_class_type="rqt_gui_cpp::Plugin">
+        <description>Helelani IP Camera Viewer</description>
+        <qtgui>
+            <group>
+                <label>Helelani</label>
+                <icon type="theme">folder</icon>
+                <statustip>Plugins related to PISCES Helelani.</statustip>
+            </group>
+            <label>Helelani IP Camera Viewer</label>
+            <statustip>Helelani IP Camera Viewer</statustip>
+        </qtgui>
+    </class>
+    <class name="Helelani Camera Control" type="helelani_client::HelelaniCameraControl" base_class_type="rqt_gui_cpp::Plugin">
+        <description>Helelani Camera Control</description>
+        <qtgui>
+            <group>
+                <label>Helelani</label>
+                <icon type="theme">folder</icon>
+                <statustip>Plugins related to PISCES Helelani.</statustip>
+            </group>
+            <label>Helelani Camera Control</label>
+            <statustip>Helelani Camera Control</statustip>
+        </qtgui>
+    </class>
 </library>

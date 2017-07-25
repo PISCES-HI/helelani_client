@@ -2,7 +2,7 @@
 #include "SVGHelper.h"
 #include <QtGui/QPaintEvent>
 #include <QtGui/QPainter>
-#include <math.h>
+#include <cmath>
 
 AttitudeWidget::AttitudeWidget(QWidget* parent)
 : QWidget(parent, Qt::WindowType::Widget),
@@ -47,14 +47,14 @@ void AttitudeWidget::paintEvent(QPaintEvent* ev)
     QPainter painter(this);
     painter.setClipRect(horizonclipBounds);
     painter.setTransform(scaleDown * horizonXf);
-    m_renderer.render(&painter, "horizon", ev->rect());
+    m_renderer.render(&painter, "horizon");
     painter.setClipping(false);
     painter.setTransform(scaleDown * maskXf);
-    m_renderer.render(&painter, "mask", ev->rect());
+    m_renderer.render(&painter, "mask");
     painter.setTransform(scaleDown * turretXf);
-    m_renderer.render(&painter, "turret", ev->rect());
+    m_renderer.render(&painter, "turret");
     painter.setTransform(scaleDown * tickdecoXf);
-    m_renderer.render(&painter, "tickdeco", ev->rect());
+    m_renderer.render(&painter, "tickdeco");
     painter.resetTransform();
 
     QString rollStr;

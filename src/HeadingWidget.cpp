@@ -2,7 +2,6 @@
 #include "SVGHelper.h"
 #include <QtGui/QPaintEvent>
 #include <QtGui/QPainter>
-#include <math.h>
 #include <cmath>
 
 HeadingWidget::HeadingWidget(QWidget* parent)
@@ -41,11 +40,11 @@ void HeadingWidget::paintEvent(QPaintEvent* ev)
     /* Draw components of widget */
     QPainter painter(this);
     painter.setTransform(scaleDown * backgroundXf);
-    m_renderer.render(&painter, "background", ev->rect());
+    m_renderer.render(&painter, "background");
     painter.setTransform(scaleDown * compassXf);
-    m_renderer.render(&painter, "compass", ev->rect());
+    m_renderer.render(&painter, "compass");
     painter.setTransform(scaleDown * foregroundXf);
-    m_renderer.render(&painter, "foreground", ev->rect());
+    m_renderer.render(&painter, "foreground");
     painter.resetTransform();
 
     double heading = std::fmod(m_angle * 180.0 / M_PI, 360.0);

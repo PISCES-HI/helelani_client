@@ -6,6 +6,7 @@
 
 class HeadingWidget : public QWidget
 {
+    Q_OBJECT
     QSvgRenderer m_renderer;
 
     /* Element rectangles in SVG document space */
