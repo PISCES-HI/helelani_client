@@ -29,6 +29,10 @@ public:
     virtual CommandItem* index(int row)
     { return m_next ? (m_next->forward() ? m_next->index(row) : m_next) : nullptr; }
     virtual QVariant data() const { return {}; }
+    virtual Qt::ItemFlags flags() const
+    { return Qt::ItemIsSelectable | Qt::ItemIsEnabled; }
+    virtual QValidator::State validate(const QString& str) const
+    { return QValidator::State::Invalid; }
 };
 
 class ArgumentEnum : public CommandItem
@@ -43,10 +47,18 @@ public:
 
 class NumberArg : public CommandItem
 {
+    QDoubleValidator m_doubleValidator;
 public:
     NumberArg(CommandItem* parent, CommandItem* next) :
             CommandItem(0, parent, next) {}
     QVariant data() const override { return "<number>"; }
+    Qt::ItemFlags flags() const override { return Qt::NoItemFlags; }
+    QValidator::State validate(const QString& str) const override
+    {
+        QString copy = str;
+        int pos = 0;
+        return m_doubleValidator.validate(copy, pos);
+    }
 };
 
 class DriveDirArg : public CommandItem
@@ -283,7 +295,7 @@ public:
     {
         if (!index.isValid())
             return Qt::ItemFlag::NoItemFlags;
-        return QAbstractItemModel::flags(index);
+        return static_cast<CommandItem*>(index.internalPointer())->flags();
     }
     QModelIndex index(int row, int column,
                       const QModelIndex& p) const override
@@ -362,6 +374,47 @@ public:
     }
 };
 
+class CommandValidator : public QValidator
+{
+    CommandCompleter& m_completer;
+public:
+    CommandValidator(CommandCompleter& completer, QObject* parent = nullptr) :
+    QValidator(parent), m_completer(completer)
+    {}
+    State validate(QString& str, int& pos) const override
+    {
+        State ret = State::Acceptable;
+        const QAbstractItemModel* model = m_completer.model();
+        QStringList list = m_completer.splitPath(str);
+        QModelIndex idx = model->index(0, 0);
+        for (const QString& substr : list)
+        {
+            if (substr == " ")
+                continue;
+            if (ret == State::Intermediate)
+                return State::Invalid;
+
+            QModelIndexList matches =
+                    model->match(idx, Qt::EditRole, substr, 1, Qt::MatchStartsWith);
+            if (matches.isEmpty())
+            {
+                auto item = static_cast<CommandItem*>(idx.internalPointer());
+                printf("VALIDATING %s\n", substr.toUtf8().data());
+                State st = item->validate(substr);
+                if (st == State::Invalid)
+                    return State::Invalid;
+            }
+
+            if (matches[0].data(Qt::EditRole).toString().compare
+                    (substr, Qt::CaseInsensitive) != 0)
+                ret = State::Intermediate;
+            else
+                idx = matches[0].child(0, 0);
+        }
+        return ret;
+    }
+};
+
 class HelelaniCommand : public rqt_gui_cpp::Plugin
 {
     Q_OBJECT
@@ -381,6 +434,7 @@ private:
     QWidget* m_widget = nullptr;
     CommandModel m_cmdModel;
     CommandCompleter m_cmdCompleter;
+    CommandValidator m_cmdValidator;
 };
 
 }

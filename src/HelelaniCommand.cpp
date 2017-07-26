@@ -4,7 +4,8 @@
 namespace helelani_client {
 
 HelelaniCommand::HelelaniCommand()
-: m_cmdModel(this), m_cmdCompleter(&m_cmdModel, this)
+: m_cmdModel(this), m_cmdCompleter(&m_cmdModel, this),
+  m_cmdValidator(m_cmdCompleter, this)
 {
 }
 
@@ -26,6 +27,7 @@ void HelelaniCommand::initPlugin(qt_gui_cpp::PluginContext& context)
     QObject::connect(m_ui.commandEdit, SIGNAL(returnPressed()),
                      this, SLOT(runCommand()));
     m_ui.commandEdit->setCompleter(&m_cmdCompleter);
+    m_ui.commandEdit->setValidator(&m_cmdValidator);
 
     ros::NodeHandle rosNode;
 }
