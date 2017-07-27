@@ -54,7 +54,7 @@ add_library(${PROJECT_NAME} ${UI_GENERATED_HEADERS} ${RES_SOURCES}
             src/HelelaniIPCamViewer.cpp src/HelelaniIPCamViewer.h
             src/HelelaniCameraControl.cpp src/HelelaniCameraControl.h
             src/CameraControlWidget.cpp src/CameraControlWidget.h
-            src/SVGHelper.h src/SubVideoRendererWidget.h)
+            src/SVGHelper.h src/SubVideoRendererWidget.h src/CommandLineEdit.h)
 
 ## Add cmake target dependencies of the library
 add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

@@ -5,13 +5,24 @@
 #include <QtCore/QtCore>
 #include <QtCore/QAbstractItemModel>
 #include <QtGui/QCompleter>
+#include <QtGui/QTableWidgetItem>
 #include <rqt_gui_cpp/plugin.h>
 #include <ros/node_handle.h>
 #include "ui_HelelaniCommand.h"
 #include <mutex>
 #include <QtGui/QListView>
+#include <helelani_common/DriveCommand.h>
 
 namespace helelani_client {
+
+class CommandSubmitEvent : public QEvent
+{
+    friend class HelelaniCommand;
+    helelani_common::DriveCommand m_msg;
+public:
+    CommandSubmitEvent(const helelani_common::DriveCommand& msg)
+    : QEvent(QEvent::Type(int(QEvent::User) + 10)), m_msg(msg) {}
+};
 
 class CommandItem
 {
@@ -29,10 +40,13 @@ public:
     virtual CommandItem* index(int row)
     { return m_next ? (m_next->forward() ? m_next->index(row) : m_next) : nullptr; }
     virtual QVariant data() const { return {}; }
+    virtual QVariant editData() const { return data(); }
     virtual Qt::ItemFlags flags() const
     { return Qt::ItemIsSelectable | Qt::ItemIsEnabled; }
     virtual QValidator::State validate(const QString& str) const
     { return QValidator::State::Invalid; }
+    virtual void toMsg(helelani_common::DriveCommand& msg,
+                       const QStringList& args) const {}
 };
 
 class ArgumentEnum : public CommandItem
@@ -47,17 +61,19 @@ public:
 
 class NumberArg : public CommandItem
 {
+    mutable QString m_enteredString;
     QDoubleValidator m_doubleValidator;
 public:
     NumberArg(CommandItem* parent, CommandItem* next) :
             CommandItem(0, parent, next) {}
     QVariant data() const override { return "<number>"; }
-    Qt::ItemFlags flags() const override { return Qt::NoItemFlags; }
+    QVariant editData() const override { return m_enteredString; }
+    Qt::ItemFlags flags() const override { return Qt::ItemIsSelectable; }
     QValidator::State validate(const QString& str) const override
     {
-        QString copy = str;
+        m_enteredString = str;
         int pos = 0;
-        return m_doubleValidator.validate(copy, pos);
+        return m_doubleValidator.validate(m_enteredString, pos);
     }
 };
 
@@ -83,6 +99,14 @@ public:
         default:
             return nullptr;
         }
+    }
+    static uint8_t DirEnum(const QString& str)
+    {
+        if (!str.compare("forward", Qt::CaseInsensitive))
+            return helelani_common::DriveCommand::DIR_FORWARD;
+        if (!str.compare("backward", Qt::CaseInsensitive))
+            return helelani_common::DriveCommand::DIR_BACKWARD;
+        return helelani_common::DriveCommand::DIR_FORWARD;
     }
 };
 
@@ -113,6 +137,16 @@ public:
             return nullptr;
         }
     }
+    static uint8_t UnitEnum(const QString& str)
+    {
+        if (!str.compare("seconds", Qt::CaseInsensitive))
+            return helelani_common::DriveCommand::UNIT_SECONDS;
+        if (!str.compare("rotations", Qt::CaseInsensitive))
+            return helelani_common::DriveCommand::UNIT_ROTATIONS;
+        if (!str.compare("meters", Qt::CaseInsensitive))
+            return helelani_common::DriveCommand::UNIT_METERS;
+        return helelani_common::DriveCommand::UNIT_SECONDS;
+    }
 };
 
 class DriveCommand : public CommandItem
@@ -129,6 +163,18 @@ public:
             m_unit(&m_val, &m_throttle),
             m_throttle(&m_unit, nullptr) {}
     QVariant data() const { return "drive"; }
+    void toMsg(helelani_common::DriveCommand& msg,
+               const QStringList& args) const
+    {
+        if (args.size() < 4)
+            return;
+        msg.cmd = helelani_common::DriveCommand::CMD_DRIVE;
+        msg.dir = DriveDirArg::DirEnum(args[1]);
+        msg.value = args[2].toFloat();
+        msg.unit = DriveUnitArg::UnitEnum(args[3]);
+        if (args.size() >= 5)
+            msg.throttle = args[4].toFloat();
+    }
 };
 
 class TurnDirArg : public CommandItem
@@ -153,6 +199,14 @@ public:
         default:
             return nullptr;
         }
+    }
+    static uint8_t DirEnum(const QString& str)
+    {
+        if (!str.compare("left", Qt::CaseInsensitive))
+            return helelani_common::DriveCommand::DIR_LEFT;
+        if (!str.compare("right", Qt::CaseInsensitive))
+            return helelani_common::DriveCommand::DIR_RIGHT;
+        return helelani_common::DriveCommand::DIR_LEFT;
     }
 };
 
@@ -183,6 +237,16 @@ public:
             return nullptr;
         }
     }
+    static uint8_t UnitEnum(const QString& str)
+    {
+        if (!str.compare("seconds", Qt::CaseInsensitive))
+            return helelani_common::DriveCommand::UNIT_SECONDS;
+        if (!str.compare("degrees", Qt::CaseInsensitive))
+            return helelani_common::DriveCommand::UNIT_DEGREES;
+        if (!str.compare("rotations", Qt::CaseInsensitive))
+            return helelani_common::DriveCommand::UNIT_ROTATIONS;
+        return helelani_common::DriveCommand::UNIT_SECONDS;
+    }
 };
 
 class TurnCommand : public CommandItem
@@ -199,19 +263,33 @@ public:
             m_unit(&m_val, &m_throttle),
             m_throttle(&m_unit, nullptr) {}
     QVariant data() const { return "turn"; }
+    void toMsg(helelani_common::DriveCommand& msg,
+               const QStringList& args) const
+    {
+        if (args.size() < 4)
+            return;
+        msg.cmd = helelani_common::DriveCommand::CMD_TURN;
+        msg.dir = TurnDirArg::DirEnum(args[1]);
+        msg.value = args[2].toFloat();
+        msg.unit = TurnUnitArg::UnitEnum(args[3]);
+        if (args.size() >= 5)
+            msg.throttle = args[4].toFloat();
+    }
 };
 
 class SadlDirArg : public CommandItem
 {
     ArgumentEnum m_up;
     ArgumentEnum m_down;
+    ArgumentEnum m_autolevel;
 public:
     SadlDirArg(CommandItem* parent, CommandItem* next) :
             CommandItem(0, parent, next),
             m_up(0, parent, next, "up"),
-            m_down(1, parent, next, "down") {}
+            m_down(1, parent, next, "down"),
+            m_autolevel(2, parent, next, "autolevel") {}
     bool forward() const override { return true; }
-    int rowCount() const override { return 2; }
+    int rowCount() const override { return 3; }
     CommandItem* index(int row) override
     {
         switch (row)
@@ -220,20 +298,43 @@ public:
             return &m_up;
         case 1:
             return &m_down;
+        case 2:
+            return &m_autolevel;
         default:
             return nullptr;
         }
+    }
+    static uint8_t DirEnum(const QString& str)
+    {
+        if (!str.compare("up", Qt::CaseInsensitive))
+            return helelani_common::DriveCommand::DIR_UP;
+        if (!str.compare("down", Qt::CaseInsensitive))
+            return helelani_common::DriveCommand::DIR_DOWN;
+        if (!str.compare("autolevel", Qt::CaseInsensitive))
+            return helelani_common::DriveCommand::DIR_AUTOLEVEL;
+        return helelani_common::DriveCommand::DIR_UP;
     }
 };
 
 class SadlCommand : public CommandItem
 {
     SadlDirArg m_dir;
+    NumberArg m_val;
 public:
     SadlCommand(int row, CommandItem* parent) :
             CommandItem(row, parent, &m_dir),
-            m_dir(this, nullptr) {}
+            m_dir(this, &m_val),
+            m_val(&m_dir, nullptr) {}
     QVariant data() const { return "sadl"; }
+    void toMsg(helelani_common::DriveCommand& msg,
+               const QStringList& args) const
+    {
+        if (args.size() < 3)
+            return;
+        msg.cmd = helelani_common::DriveCommand::CMD_SADL;
+        msg.dir = SadlDirArg::DirEnum(args[1]);
+        msg.value = args[2].toFloat();
+    }
 };
 
 class KillCommand : public CommandItem
@@ -242,6 +343,11 @@ public:
     KillCommand(int row, CommandItem* parent) :
             CommandItem(row, parent, nullptr) {}
     QVariant data() const { return "kill"; }
+    void toMsg(helelani_common::DriveCommand& msg,
+               const QStringList& args) const
+    {
+        msg.cmd = helelani_common::DriveCommand::CMD_KILL;
+    }
 };
 
 class RootCommand : public CommandItem
@@ -286,10 +392,17 @@ public:
         if (!index.isValid())
             return {};
 
-        if (role != Qt::DisplayRole && role != Qt::EditRole)
+        CommandItem* cmdItem =
+                static_cast<CommandItem*>(index.internalPointer());
+        switch (role)
+        {
+        case Qt::DisplayRole:
+            return cmdItem->data();
+        case Qt::EditRole:
+            return cmdItem->editData();
+        default:
             return QVariant();
-
-        return static_cast<CommandItem*>(index.internalPointer())->data();
+        }
     }
     Qt::ItemFlags flags(const QModelIndex& index) const override
     {
@@ -347,8 +460,8 @@ class CommandCompleter : public QCompleter
 {
     Q_OBJECT
 public:
-    CommandCompleter(CommandModel* model, QObject* parent = nullptr) :
-            QCompleter(model, parent)
+    CommandCompleter(CommandModel* model, QObject* parent = nullptr)
+    : QCompleter(model, parent)
     {
         setCaseSensitivity(Qt::CaseInsensitive);
         setCompletionMode(CompletionMode::UnfilteredPopupCompletion);
@@ -364,7 +477,7 @@ public:
     {
         QString path = static_cast<QLineEdit*>(widget())->text();
         QStringList list = path.split(' ', QString::SkipEmptyParts);
-        if (!path.endsWith(' '))
+        if (!path.endsWith(' ') && list.size())
             list.pop_back();
         QString ret;
         for (const QString& str : list)
@@ -376,17 +489,20 @@ public:
 
 class CommandValidator : public QValidator
 {
+    Q_OBJECT
     CommandCompleter& m_completer;
 public:
     CommandValidator(CommandCompleter& completer, QObject* parent = nullptr) :
     QValidator(parent), m_completer(completer)
     {}
+
     State validate(QString& str, int& pos) const override
     {
         State ret = State::Acceptable;
-        const QAbstractItemModel* model = m_completer.model();
+        QAbstractItemModel* model = m_completer.model();
         QStringList list = m_completer.splitPath(str);
         QModelIndex idx = model->index(0, 0);
+
         for (const QString& substr : list)
         {
             if (substr == " ")
@@ -395,14 +511,15 @@ public:
                 return State::Invalid;
 
             QModelIndexList matches =
-                    model->match(idx, Qt::EditRole, substr, 1, Qt::MatchStartsWith);
+                    model->match(idx, Qt::DisplayRole, substr, 1, Qt::MatchStartsWith);
             if (matches.isEmpty())
             {
                 auto item = static_cast<CommandItem*>(idx.internalPointer());
-                printf("VALIDATING %s\n", substr.toUtf8().data());
-                State st = item->validate(substr);
-                if (st == State::Invalid)
+                ret = item->validate(substr);
+                if (ret == State::Invalid)
                     return State::Invalid;
+                idx = idx.child(0, 0);
+                continue;
             }
 
             if (matches[0].data(Qt::EditRole).toString().compare
@@ -411,6 +528,7 @@ public:
             else
                 idx = matches[0].child(0, 0);
         }
+
         return ret;
     }
 };
@@ -428,6 +546,7 @@ public:
 
 public slots:
     void runCommand();
+    void cellChanged(int row, int column);
 
 private:
     Ui::HelelaniCommand m_ui;
@@ -435,6 +554,30 @@ private:
     CommandModel m_cmdModel;
     CommandCompleter m_cmdCompleter;
     CommandValidator m_cmdValidator;
+    ros::Publisher m_cmdPub;
+
+    helelani_common::DriveCommand parseMessage(const QString& str) const
+    {
+        helelani_common::DriveCommand ret = {};
+        using State = QValidator::State;
+        QAbstractItemModel* model = m_cmdCompleter.model();
+        QStringList list = m_cmdCompleter.splitPath(str);
+        if (list.isEmpty())
+            return ret;
+
+        QModelIndex idx = model->index(0, 0);
+        QModelIndexList matches =
+                model->match(idx, Qt::DisplayRole, list[0], 1, Qt::MatchExactly);
+        if (matches.isEmpty())
+            return ret;
+
+        auto cmd = static_cast<CommandItem*>(matches[0].internalPointer());
+        cmd->toMsg(ret, list);
+
+        return ret;
+    }
+
+    void customEvent(QEvent* e) override;
 };
 
 }
