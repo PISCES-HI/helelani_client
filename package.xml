@@ -46,6 +46,7 @@
   <depend>std_msgs</depend>
   <depend>rqt_gui_cpp</depend>
   <depend>rqt_gui</depend>
+  <depend>message_filters</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

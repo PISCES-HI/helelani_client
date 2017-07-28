@@ -40,6 +40,11 @@
      </column>
      <column>
       <property name="text">
+       <string>Comm Timer</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>Information</string>
       </property>
      </column>

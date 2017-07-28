@@ -47,4 +47,28 @@
             <statustip>Helelani Camera Control</statustip>
         </qtgui>
     </class>
+    <class name="Helelani Mission Control" type="helelani_client::HelelaniMissionControlClient" base_class_type="rqt_gui_cpp::Plugin">
+        <description>Helelani Mission Control</description>
+        <qtgui>
+            <group>
+                <label>Helelani</label>
+                <icon type="theme">folder</icon>
+                <statustip>Plugins related to PISCES Helelani.</statustip>
+            </group>
+            <label>Helelani Mission Control</label>
+            <statustip>Helelani Mission Control</statustip>
+        </qtgui>
+    </class>
+    <class name="Helelani Throttle Pad" type="helelani_client::HelelaniThrottlePad" base_class_type="rqt_gui_cpp::Plugin">
+        <description>Helelani Throttle Pad</description>
+        <qtgui>
+            <group>
+                <label>Helelani</label>
+                <icon type="theme">folder</icon>
+                <statustip>Plugins related to PISCES Helelani.</statustip>
+            </group>
+            <label>Helelani Throttle Pad</label>
+            <statustip>Helelani Throttle Pad</statustip>
+        </qtgui>
+    </class>
 </library>

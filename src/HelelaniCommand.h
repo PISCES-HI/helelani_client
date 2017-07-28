@@ -12,16 +12,112 @@
 #include <mutex>
 #include <QtGui/QListView>
 #include <helelani_common/DriveCommand.h>
+#include <helelani_common/Mission.h>
 
 namespace helelani_client {
 
 class CommandSubmitEvent : public QEvent
 {
     friend class HelelaniCommand;
-    helelani_common::DriveCommand m_msg;
+    boost::shared_ptr<helelani_common::DriveCommand> m_msg;
 public:
-    CommandSubmitEvent(const helelani_common::DriveCommand& msg)
-    : QEvent(QEvent::Type(int(QEvent::User) + 10)), m_msg(msg) {}
+    CommandSubmitEvent(boost::shared_ptr<helelani_common::DriveCommand> msg)
+    : QEvent(QEvent::Type(int(QEvent::User) + 10)), m_msg(std::move(msg)) {}
+};
+
+class CommandTimerWidgetItem : public QTableWidgetItem
+{
+    boost::shared_ptr<helelani_common::DriveCommand> m_msg;
+    float m_timerUp;
+    float m_timerDown;
+    enum class Icon
+    {
+        Uninitialized,
+        Up,
+        Down
+    };
+    Icon m_curIcon = Icon::Uninitialized;
+    bool m_done = false;
+
+    void _updateDisplay()
+    {
+        if (m_timerUp > 0.f)
+        {
+            if (m_curIcon != Icon::Up)
+            {
+                setIcon(QIcon::fromTheme("go-up"));
+                m_curIcon = Icon::Up;
+            }
+            setText(QString::number(m_timerUp, 'f', 1));
+        }
+        else
+        {
+            if (m_curIcon != Icon::Down)
+            {
+                setIcon(QIcon::fromTheme("go-down"));
+                m_curIcon = Icon::Down;
+            }
+            setText(QString::number(m_timerDown, 'f', 1));
+        }
+    }
+
+public:
+    CommandTimerWidgetItem(boost::shared_ptr<helelani_common::DriveCommand> msg,
+                           float timerUp, float timerDown)
+    : m_msg(std::move(msg)), m_timerUp(timerUp), m_timerDown(timerDown)
+    {
+        _updateDisplay();
+    }
+
+    void update(float dt, ros::Publisher& pub)
+    {
+        if (m_done)
+            return;
+
+        if (m_timerUp > 0.f)
+        {
+            m_timerUp -= dt;
+            if (m_timerUp < 0.f)
+            {
+                m_timerDown += m_timerUp;
+                if (m_timerDown < 0.f)
+                    m_timerDown = 0.f;
+                m_timerUp = 0.f;
+            }
+        }
+
+        if (m_timerUp > 0.f)
+        {
+            _updateDisplay();
+            return;
+        }
+        else if (m_msg)
+        {
+            pub.publish(*m_msg);
+            m_msg.reset();
+        }
+
+        if (m_timerDown > 0.f)
+        {
+            m_timerDown -= dt;
+            if (m_timerDown < 0.f)
+                m_timerDown = 0.f;
+        }
+
+        if (m_timerUp <= 0.f && m_timerDown <= 0.f)
+            m_done = true;
+
+        _updateDisplay();
+    }
+
+    void cancel()
+    {
+        m_timerUp = 0.f;
+        m_timerDown = 0.f;
+        m_msg.reset();
+    }
+
+    bool isDone() const { return m_done; }
 };
 
 class CommandItem
@@ -515,6 +611,8 @@ public:
             if (matches.isEmpty())
             {
                 auto item = static_cast<CommandItem*>(idx.internalPointer());
+                if (!item)
+                    return State::Invalid;
                 ret = item->validate(substr);
                 if (ret == State::Invalid)
                     return State::Invalid;
@@ -547,6 +645,9 @@ public:
 public slots:
     void runCommand();
     void cellChanged(int row, int column);
+    void updateTick();
+    void tableMenuRequested(QPoint pt);
+    void clearInactive();
 
 private:
     Ui::HelelaniCommand m_ui;
@@ -554,29 +655,15 @@ private:
     CommandModel m_cmdModel;
     CommandCompleter m_cmdCompleter;
     CommandValidator m_cmdValidator;
+    ros::Subscriber m_missionSub;
     ros::Publisher m_cmdPub;
+    int m_elapsedSeconds = 0;
+    float m_delayUp = 0.f;
+    float m_delayDown = 0.f;
+    QTimer m_updateTimer;
 
-    helelani_common::DriveCommand parseMessage(const QString& str) const
-    {
-        helelani_common::DriveCommand ret = {};
-        using State = QValidator::State;
-        QAbstractItemModel* model = m_cmdCompleter.model();
-        QStringList list = m_cmdCompleter.splitPath(str);
-        if (list.isEmpty())
-            return ret;
-
-        QModelIndex idx = model->index(0, 0);
-        QModelIndexList matches =
-                model->match(idx, Qt::DisplayRole, list[0], 1, Qt::MatchExactly);
-        if (matches.isEmpty())
-            return ret;
-
-        auto cmd = static_cast<CommandItem*>(matches[0].internalPointer());
-        cmd->toMsg(ret, list);
-
-        return ret;
-    }
-
+    void missionCallback(const helelani_common::Mission& msg);
+    boost::shared_ptr<helelani_common::DriveCommand> parseMessage(const QString& str) const;
     void customEvent(QEvent* e) override;
 };
 

@@ -5,7 +5,7 @@ project(helelani_client)
 add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
-find_package(catkin REQUIRED COMPONENTS rqt_gui rqt_gui_cpp)
+find_package(catkin REQUIRED COMPONENTS rqt_gui rqt_gui_cpp message_filters)
 find_package(Boost REQUIRED COMPONENTS system)
 
 ###################################
@@ -15,7 +15,7 @@ find_package(Boost REQUIRED COMPONENTS system)
 catkin_package(
   INCLUDE_DIRS src
   LIBRARIES helelani_client
-  CATKIN_DEPENDS roscpp std_msgs rqt_gui_cpp helelani_common
+  CATKIN_DEPENDS roscpp std_msgs rqt_gui_cpp helelani_common message_filters
 )
 
 ###########
@@ -44,7 +44,8 @@ include_directories(src
                     ${QTAVWIDGETS_INCLUDE_DIRS})
 
 QT4_WRAP_UI(UI_GENERATED_HEADERS src/HelelaniIMU.ui src/HelelaniCommand.ui
-            src/HelelaniIPCamViewer.ui src/HelelaniCameraControl.ui)
+            src/HelelaniIPCamViewer.ui src/HelelaniCameraControl.ui
+            src/HelelaniMissionControlClient.ui src/HelelaniThrottlePad.ui)
 QT4_ADD_RESOURCES(RES_SOURCES resources/resources.qrc)
 add_library(${PROJECT_NAME} ${UI_GENERATED_HEADERS} ${RES_SOURCES}
             src/HelelaniIMU.cpp src/HelelaniIMU.h
@@ -54,7 +55,10 @@ add_library(${PROJECT_NAME} ${UI_GENERATED_HEADERS} ${RES_SOURCES}
             src/HelelaniIPCamViewer.cpp src/HelelaniIPCamViewer.h
             src/HelelaniCameraControl.cpp src/HelelaniCameraControl.h
             src/CameraControlWidget.cpp src/CameraControlWidget.h
-            src/SVGHelper.h src/SubVideoRendererWidget.h src/CommandLineEdit.h)
+            src/HelelaniMissionControlClient.cpp src/HelelaniMissionControlClient.h
+            src/HelelaniThrottlePad.cpp src/HelelaniThrottlePad.h
+            src/SVGHelper.h src/SubVideoRendererWidget.h src/CommandLineEdit.h
+            src/DriveTrackpad.cpp src/DriveTrackpad.h)
 
 ## Add cmake target dependencies of the library
 add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -79,6 +83,8 @@ install(TARGETS ${PROJECT_NAME}
 
 install(PROGRAMS scripts/helelani_imu scripts/helelani_command
         scripts/helelani_ip_cam scripts/helelani_camera_control
+        scripts/helelani_mission_control_client
+        scripts/helelani_throttle_pad
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
