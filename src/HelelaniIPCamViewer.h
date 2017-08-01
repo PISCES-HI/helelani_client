@@ -19,6 +19,13 @@ class HelelaniIPCamViewer : public rqt_gui_cpp::Plugin
     Q_OBJECT
 
 public slots:
+    void mainMenuRequested(QPoint pt);
+    void mainShotSave();
+    void leftMenuRequested(QPoint pt);
+    void leftShotSave();
+    void rightMenuRequested(QPoint pt);
+    void rightShotSave();
+    void frameAvailable(const QtAV::VideoFrame& frame);
     void subVideoClicked(SubVideoRendererWidget*, QMouseEvent*);
 
 public:
@@ -32,6 +39,7 @@ private:
     Ui::HelelaniIPCamViewer m_ui;
     QtAV::AVPlayer m_cameras[3]; // main, forwardhaz, reversehaz
     QWidget* m_widget;
+    QString m_lastImagePath;
 };
 
 }

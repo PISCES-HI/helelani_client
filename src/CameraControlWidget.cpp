@@ -66,9 +66,15 @@ void CameraControlWidget::setName(const QString& name)
     update();
 }
 
+void CameraControlWidget::setAngleBias(double a)
+{
+    m_angleBias = a;
+    setAngle(m_angle);
+}
+
 void CameraControlWidget::setAngle(double a)
 {
-    m_angle = std::max(std::min(a, M_PI / 2.0), -M_PI / 2.0);
+    m_angle = std::max(std::min(a, M_PI / 2.0 + m_angleBias), -M_PI / 2.0 + m_angleBias);
     update();
 }
 
@@ -84,7 +90,7 @@ void CameraControlWidget::doAngleSet(QMouseEvent* ev)
 void CameraControlWidget::doSignal()
 {
     helelani_common::CameraCtrl msg;
-    msg.pan = float(m_angle * 180.0 / M_PI) + 90.f;
+    msg.pan = float((m_angle - m_angleBias) * 180.0 / M_PI) + 90.f;
     msg.tilt = float(m_pitch + 90);
     emit camUpdate(msg);
 }

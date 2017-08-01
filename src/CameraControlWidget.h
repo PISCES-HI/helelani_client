@@ -17,6 +17,7 @@ class CameraControlWidget : public QWidget
     QRectF m_backgroundBounds;
 
     QString m_name;
+    double m_angleBias = 0.0;
     double m_angle = 0.0;
     int m_pitch = 0;
     bool m_mouseDown = false;
@@ -26,6 +27,7 @@ public:
     explicit CameraControlWidget(QWidget* parent = 0);
     void paintEvent(QPaintEvent* ev) override;
     void setName(const QString& name);
+    void setAngleBias(double a);
     void setAngle(double a);
     void mousePressEvent(QMouseEvent* ev) override;
     void mouseMoveEvent(QMouseEvent* ev) override;

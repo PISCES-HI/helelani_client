@@ -1,5 +1,8 @@
 #include "HelelaniIPCamViewer.h"
 #include <pluginlib/class_list_macros.h>
+#include <QtGui/QMenu>
+#include <QtGui/QFileDialog>
+#include <QtGui/QMouseEvent>
 
 namespace helelani_client {
 
@@ -48,8 +51,86 @@ static void startStream(QtAV::AVPlayer& player, QtAV::VideoRenderer* renderer, c
     player.play(url);
 }
 
+void HelelaniIPCamViewer::mainMenuRequested(QPoint pt)
+{
+    auto menu = new QMenu(m_widget);
+    auto action = new QAction(QIcon::fromTheme("camera-photo"), "Save Screenshot", m_widget);
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(mainShotSave()));
+    menu->addAction(action);
+    menu->popup(m_ui.mainRenderer->mapToGlobal(pt));
+}
+
+void HelelaniIPCamViewer::mainShotSave()
+{
+    for (QtAV::AVPlayer& subPlayer : m_cameras)
+        if (subPlayer.renderer() == m_ui.mainRenderer)
+            subPlayer.videoCapture()->capture();
+}
+
+void HelelaniIPCamViewer::leftMenuRequested(QPoint pt)
+{
+    auto menu = new QMenu(m_widget);
+    auto action = new QAction(QIcon::fromTheme("camera-photo"), "Save Screenshot", m_widget);
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(leftShotSave()));
+    menu->addAction(action);
+    menu->popup(m_ui.subRendererLeft->mapToGlobal(pt));
+}
+
+void HelelaniIPCamViewer::leftShotSave()
+{
+    for (QtAV::AVPlayer& subPlayer : m_cameras)
+        if (subPlayer.renderer() == m_ui.subRendererLeft)
+            subPlayer.videoCapture()->capture();
+}
+
+void HelelaniIPCamViewer::rightMenuRequested(QPoint pt)
+{
+    auto menu = new QMenu(m_widget);
+    auto action = new QAction(QIcon::fromTheme("camera-photo"), "Save Screenshot", m_widget);
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(rightShotSave()));
+    menu->addAction(action);
+    menu->popup(m_ui.subRendererRight->mapToGlobal(pt));
+}
+
+void HelelaniIPCamViewer::rightShotSave()
+{
+    for (QtAV::AVPlayer& subPlayer : m_cameras)
+        if (subPlayer.renderer() == m_ui.subRendererRight)
+            subPlayer.videoCapture()->capture();
+}
+
+void HelelaniIPCamViewer::frameAvailable(const QtAV::VideoFrame& frame)
+{
+    if (QFile::exists(m_lastImagePath + ".png"))
+    {
+        int numIdx = m_lastImagePath.lastIndexOf(QRegExp("[0-9]+"));
+        if (numIdx < 0)
+            m_lastImagePath += "-1";
+        else
+        {
+            int num = m_lastImagePath.mid(numIdx).toInt();
+            m_lastImagePath = m_lastImagePath.left(numIdx);
+            if (m_lastImagePath.endsWith('-'))
+                m_lastImagePath.chop(1);
+            m_lastImagePath += "-" + QString::number(num + 1);
+        }
+    }
+    QString fileName = QFileDialog::getSaveFileName(m_widget, tr("Save File"),
+                                                    m_lastImagePath,
+                                                    tr("Images (*.png)"));
+    if (fileName.endsWith(".png"))
+        fileName.chop(4);
+    if (fileName.size())
+    {
+        m_lastImagePath = fileName;
+        frame.toImage().save(fileName + ".png");
+    }
+}
+
 void HelelaniIPCamViewer::subVideoClicked(SubVideoRendererWidget* src, QMouseEvent* ev)
 {
+    if (ev->button() != Qt::MouseButton::LeftButton)
+        return;
     for (QtAV::AVPlayer& subPlayer : m_cameras)
     {
         if (subPlayer.renderer() == src)
@@ -85,6 +166,20 @@ void HelelaniIPCamViewer::initPlugin(qt_gui_cpp::PluginContext& context)
             this, SLOT(subVideoClicked(SubVideoRendererWidget*, QMouseEvent*)));
     connect(m_ui.subRendererRight, SIGNAL(clicked(SubVideoRendererWidget*, QMouseEvent*)),
             this, SLOT(subVideoClicked(SubVideoRendererWidget*, QMouseEvent*)));
+
+    m_ui.mainRenderer->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_ui.mainRenderer, SIGNAL(customContextMenuRequested(QPoint)),
+            this, SLOT(mainMenuRequested(QPoint)));
+    m_ui.subRendererLeft->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_ui.subRendererLeft, SIGNAL(customContextMenuRequested(QPoint)),
+            this, SLOT(leftMenuRequested(QPoint)));
+    m_ui.subRendererRight->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_ui.subRendererRight, SIGNAL(customContextMenuRequested(QPoint)),
+            this, SLOT(rightMenuRequested(QPoint)));
+
+    for (int i=0 ; i<3 ; ++i)
+        connect(m_cameras[i].videoCapture(), SIGNAL(frameAvailable(const QtAV::VideoFrame&)),
+                this, SLOT(frameAvailable(const QtAV::VideoFrame&)));
 
     startStream(m_cameras[0], m_ui.mainRenderer, "rtsp://10.10.153.9/axis-media/media.amp");
     startStream(m_cameras[1], m_ui.subRendererLeft, "rtsp://10.10.153.10/axis-media/media.amp");

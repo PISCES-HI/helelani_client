@@ -23,6 +23,7 @@ void HelelaniCameraControl::initPlugin(qt_gui_cpp::PluginContext& context)
     connect(m_ui.leftHeading, SIGNAL(camUpdate(const helelani_common::CameraCtrl&)),
             this, SLOT(situationUpdate(const helelani_common::CameraCtrl&)));
     m_ui.rightHeading->setName("Stereo Cam");
+    m_ui.rightHeading->setAngleBias(50.3 * M_PI / 180.f);
     connect(m_ui.rightPitch, SIGNAL(valueChanged(int)),
             m_ui.rightHeading, SLOT(pitchSliderChanged(int)));
     connect(m_ui.rightHeading, SIGNAL(camUpdate(const helelani_common::CameraCtrl&)),
