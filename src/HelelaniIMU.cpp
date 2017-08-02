@@ -1,5 +1,7 @@
 #include "HelelaniIMU.h"
 #include <pluginlib/class_list_macros.h>
+#include <helelani_common/helelani_common.h>
+#include <QtGui/QMenu>
 
 static void InitResources() { Q_INIT_RESOURCE(resources); }
 static void CleanupResources() { Q_CLEANUP_RESOURCE(resources); }
@@ -26,13 +28,21 @@ void HelelaniIMU::initPlugin(qt_gui_cpp::PluginContext& context)
     QObject::connect(this, SIGNAL(imuUpdated()),
                      this, SLOT(updateImuUI()));
 
+    m_ui.distanceNumber->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_ui.distanceNumber, SIGNAL(customContextMenuRequested(QPoint)),
+            this, SLOT(distanceMenuRequested(QPoint)));
+
     ros::NodeHandle rosNode;
-    m_imuSub = rosNode.subscribe("/helelani/imu", 1000, &HelelaniIMU::imuCallback, this);
+    m_imuSub = rosNode.subscribe("/helelani/imu", 10, &HelelaniIMU::imuCallback, this);
+    m_leftMotorSub = rosNode.subscribe("/helelani/left_motor", 10, &HelelaniIMU::leftMotorCallback, this);
+    m_rightMotorSub = rosNode.subscribe("/helelani/right_motor", 10, &HelelaniIMU::rightMotorCallback, this);
 }
 
 void HelelaniIMU::shutdownPlugin()
 {
     m_imuSub.shutdown();
+    m_leftMotorSub.shutdown();
+    m_rightMotorSub.shutdown();
     CleanupResources();
 }
 
@@ -54,12 +64,50 @@ void HelelaniIMU::updateImuUI()
     m_ui.attitude->setPitch(m_imuData.pitch);
     m_ui.attitude->setRoll(m_imuData.roll);
     m_ui.heading->setHeading(m_imuData.yaw);
+
+    float avgRotations = (m_leftRotations + m_rightRotations) / 2.f;
+    m_ui.distanceNumber->display(QString::number(helelani_common::RotationsToMeters
+                                 (avgRotations - m_startRotations), 'f', 1));
+    float avgSpeed = helelani_common::RotationsToMeters((m_leftSpeed + m_rightSpeed) / 2.f) / 60.f;
+    m_ui.speedNumber->display(QString::number(avgSpeed, 'f', 1));
+}
+
+void HelelaniIMU::distanceMenuRequested(QPoint pt)
+{
+    auto menu = new QMenu(m_widget);
+    auto action = new QAction(QIcon::fromTheme("edit-clear"), "Reset Distance", m_widget);
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(resetDistance()));
+    menu->addAction(action);
+    menu->popup(m_ui.distanceNumber->mapToGlobal(pt));
+}
+
+void HelelaniIMU::resetDistance()
+{
+    float avgRotations = (m_leftRotations + m_rightRotations) / 2.f;
+    m_startRotations = avgRotations;
+    m_ui.distanceNumber->display(0.f);
 }
 
 void HelelaniIMU::imuCallback(const helelani_common::Imu& message)
 {
     std::lock_guard<std::mutex> lk(m_imuLock);
     m_imuData = message;
+    emit imuUpdated();
+}
+
+void HelelaniIMU::leftMotorCallback(const helelani_common::Motor& message)
+{
+    std::lock_guard<std::mutex> lk(m_imuLock);
+    m_leftRotations = message.abs_rotations;
+    m_leftSpeed = message.speed;
+    emit imuUpdated();
+}
+
+void HelelaniIMU::rightMotorCallback(const helelani_common::Motor& message)
+{
+    std::lock_guard<std::mutex> lk(m_imuLock);
+    m_rightRotations = message.abs_rotations;
+    m_rightSpeed = message.speed;
     emit imuUpdated();
 }
 

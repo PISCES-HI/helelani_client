@@ -5,7 +5,7 @@ project(helelani_client)
 add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
-find_package(catkin REQUIRED COMPONENTS rqt_gui rqt_gui_cpp message_filters)
+find_package(catkin REQUIRED COMPONENTS rqt_gui rqt_gui_cpp message_filters helelani_common)
 find_package(Boost REQUIRED COMPONENTS system)
 
 ###################################

@@ -6,6 +6,7 @@
 #include <rqt_gui_cpp/plugin.h>
 #include <ros/node_handle.h>
 #include <helelani_common/Imu.h>
+#include <helelani_common/Motor.h>
 #include "ui_HelelaniIMU.h"
 #include <mutex>
 
@@ -22,16 +23,27 @@ public:
     void restoreSettings(const qt_gui_cpp::Settings& plugin_settings, const qt_gui_cpp::Settings& instance_settings);
 
     void imuCallback(const helelani_common::Imu& message);
+    void leftMotorCallback(const helelani_common::Motor& message);
+    void rightMotorCallback(const helelani_common::Motor& message);
 
 signals:
     void imuUpdated();
 public slots:
     void updateImuUI();
+    void distanceMenuRequested(QPoint pt);
+    void resetDistance();
 
 private:
     std::mutex m_imuLock;
     helelani_common::Imu m_imuData;
+    float m_leftRotations = 0.f;
+    float m_rightRotations = 0.f;
+    float m_leftSpeed = 0.f;
+    float m_rightSpeed = 0.f;
+    float m_startRotations = 0.f;
     ros::Subscriber m_imuSub;
+    ros::Subscriber m_leftMotorSub;
+    ros::Subscriber m_rightMotorSub;
     Ui::HelelaniIMU m_ui;
     QWidget* m_widget = nullptr;
 };
