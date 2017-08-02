@@ -36,6 +36,7 @@ void HelelaniIMU::initPlugin(qt_gui_cpp::PluginContext& context)
     m_imuSub = rosNode.subscribe("/helelani/imu", 10, &HelelaniIMU::imuCallback, this);
     m_leftMotorSub = rosNode.subscribe("/helelani/left_motor", 10, &HelelaniIMU::leftMotorCallback, this);
     m_rightMotorSub = rosNode.subscribe("/helelani/right_motor", 10, &HelelaniIMU::rightMotorCallback, this);
+    m_navSatSub = rosNode.subscribe("/helelani/nav_sat_fix", 10, &HelelaniIMU::navSatCallback, this);
 }
 
 void HelelaniIMU::shutdownPlugin()
@@ -43,6 +44,7 @@ void HelelaniIMU::shutdownPlugin()
     m_imuSub.shutdown();
     m_leftMotorSub.shutdown();
     m_rightMotorSub.shutdown();
+    m_navSatSub.shutdown();
     CleanupResources();
 }
 
@@ -69,7 +71,27 @@ void HelelaniIMU::updateImuUI()
     m_ui.distanceNumber->display(QString::number(helelani_common::RotationsToMeters
                                  (avgRotations - m_startRotations), 'f', 1));
     float avgSpeed = helelani_common::RotationsToMeters((m_leftSpeed + m_rightSpeed) / 2.f) / 60.f;
-    m_ui.speedNumber->display(QString::number(avgSpeed, 'f', 1));
+    m_ui.speedNumber->display(QString::number(avgSpeed, 'f', 2));
+
+    {
+        auto deg = int(m_latitude);
+        double minSec = std::abs(m_latitude - deg) * 60.0;
+        auto min = int(minSec);
+        auto sec = int((minSec - min) * 60.0);
+        m_ui.latDeg->display(deg);
+        m_ui.latMin->display(min);
+        m_ui.latSec->display(sec);
+    }
+
+    {
+        auto deg = int(m_longitude);
+        double minSec = std::abs(m_longitude - deg) * 60.0;
+        auto min = int(minSec);
+        auto sec = int((minSec - min) * 60.0);
+        m_ui.lonDeg->display(deg);
+        m_ui.lonMin->display(min);
+        m_ui.lonSec->display(sec);
+    }
 }
 
 void HelelaniIMU::distanceMenuRequested(QPoint pt)
@@ -108,6 +130,14 @@ void HelelaniIMU::rightMotorCallback(const helelani_common::Motor& message)
     std::lock_guard<std::mutex> lk(m_imuLock);
     m_rightRotations = message.abs_rotations;
     m_rightSpeed = message.speed;
+    emit imuUpdated();
+}
+
+void HelelaniIMU::navSatCallback(const sensor_msgs::NavSatFix& message)
+{
+    std::lock_guard<std::mutex> lk(m_imuLock);
+    m_latitude = message.latitude;
+    m_longitude = message.longitude;
     emit imuUpdated();
 }
 

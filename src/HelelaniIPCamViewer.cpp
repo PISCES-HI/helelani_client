@@ -3,11 +3,13 @@
 #include <QtGui/QMenu>
 #include <QtGui/QFileDialog>
 #include <QtGui/QMouseEvent>
+#include <VLCQtCore/Video.h>
 
 namespace helelani_client {
 
+#if 0
 // call this before loading the stream
-static void tuneForZeroLatencyLiveStream(QtAV::AVPlayer& player)
+static void tuneForZeroLatencyLiveStream(VlcMediaPlayer& player)
 {
     QVariantHash settings;
 
@@ -40,15 +42,16 @@ static void tuneForZeroLatencyLiveStream(QtAV::AVPlayer& player)
     //settings["avformat"] = avFormat;
     player.setOptionsForFormat(avFormat);
 }
+#endif
 
-static void startStream(QtAV::AVPlayer& player, QtAV::VideoRenderer* renderer, const char* url)
+void HelelaniIPCamViewer::startStream(VlcMediaPlayer& player, VlcWidgetVideo* renderer, VlcMedia* media)
 {
     //player.masterClock()->setClockType(QtAV::AVClock::VideoClock);
     //player.setBufferMode(QtAV::BufferPackets);
     //player.setBufferValue(1);
-    tuneForZeroLatencyLiveStream(player);
-    player.setRenderer(renderer);
-    player.play(url);
+    //tuneForZeroLatencyLiveStream(player);
+    player.setVideoWidget(renderer);
+    player.open(media);
 }
 
 void HelelaniIPCamViewer::mainMenuRequested(QPoint pt)
@@ -60,11 +63,21 @@ void HelelaniIPCamViewer::mainMenuRequested(QPoint pt)
     menu->popup(m_ui.mainRenderer->mapToGlobal(pt));
 }
 
+static void TakeSnapshot(VlcMediaPlayer& subPlayer)
+{
+    const char* tmpdir = getenv("TMPDIR");
+    if (!tmpdir)
+        tmpdir = "/tmp";
+    QString tmpPath(tmpdir);
+    tmpPath += "/mission_shot.png";
+    subPlayer.video()->takeSnapshot(tmpPath);
+}
+
 void HelelaniIPCamViewer::mainShotSave()
 {
-    for (QtAV::AVPlayer& subPlayer : m_cameras)
-        if (subPlayer.renderer() == m_ui.mainRenderer)
-            subPlayer.videoCapture()->capture();
+    for (auto& subPlayer : m_cameras)
+        if (subPlayer->videoWidget() == m_ui.mainRenderer)
+            TakeSnapshot(*subPlayer);
 }
 
 void HelelaniIPCamViewer::leftMenuRequested(QPoint pt)
@@ -78,9 +91,9 @@ void HelelaniIPCamViewer::leftMenuRequested(QPoint pt)
 
 void HelelaniIPCamViewer::leftShotSave()
 {
-    for (QtAV::AVPlayer& subPlayer : m_cameras)
-        if (subPlayer.renderer() == m_ui.subRendererLeft)
-            subPlayer.videoCapture()->capture();
+    for (auto& subPlayer : m_cameras)
+        if (subPlayer->videoWidget() == m_ui.subRendererLeft)
+            TakeSnapshot(*subPlayer);
 }
 
 void HelelaniIPCamViewer::rightMenuRequested(QPoint pt)
@@ -94,12 +107,12 @@ void HelelaniIPCamViewer::rightMenuRequested(QPoint pt)
 
 void HelelaniIPCamViewer::rightShotSave()
 {
-    for (QtAV::AVPlayer& subPlayer : m_cameras)
-        if (subPlayer.renderer() == m_ui.subRendererRight)
-            subPlayer.videoCapture()->capture();
+    for (auto& subPlayer : m_cameras)
+        if (subPlayer->videoWidget() == m_ui.subRendererRight)
+            TakeSnapshot(*subPlayer);
 }
 
-void HelelaniIPCamViewer::frameAvailable(const QtAV::VideoFrame& frame)
+void HelelaniIPCamViewer::frameAvailable(const QString& path)
 {
     if (QFile::exists(m_lastImagePath + ".png"))
     {
@@ -123,7 +136,7 @@ void HelelaniIPCamViewer::frameAvailable(const QtAV::VideoFrame& frame)
     if (fileName.size())
     {
         m_lastImagePath = fileName;
-        frame.toImage().save(fileName + ".png");
+        QFile::copy(path, fileName);
     }
 }
 
@@ -131,21 +144,44 @@ void HelelaniIPCamViewer::subVideoClicked(SubVideoRendererWidget* src, QMouseEve
 {
     if (ev->button() != Qt::MouseButton::LeftButton)
         return;
-    for (QtAV::AVPlayer& subPlayer : m_cameras)
+    for (auto& subPlayer : m_cameras)
     {
-        if (subPlayer.renderer() == src)
+        if (subPlayer->videoWidget() == src)
         {
-            for (QtAV::AVPlayer& mainPlayer : m_cameras)
+            for (auto& mainPlayer : m_cameras)
             {
-                if (mainPlayer.renderer() == m_ui.mainRenderer)
+                if (mainPlayer->videoWidget() == m_ui.mainRenderer)
                 {
-                    subPlayer.setRenderer(m_ui.mainRenderer);
-                    mainPlayer.setRenderer(src);
+#if 0
+                    subPlayer->stop();
+                    subPlayer->setVideoWidget(m_ui.mainRenderer);
+                    m_ui.mainRenderer->setMediaPlayer(subPlayer.get());
+                    subPlayer->play();
+                    mainPlayer->stop();
+                    mainPlayer->setVideoWidget(src);
+                    src->setMediaPlayer(mainPlayer.get());
+                    mainPlayer->play();
+#endif
+                    VlcMedia* subMedia = subPlayer->currentMedia();
+                    VlcMedia* mainMedia = mainPlayer->currentMedia();
+                    subPlayer->open(mainMedia);
+                    mainPlayer->open(subMedia);
+                    printf("SWAPPED\n");
                     return;
                 }
             }
         }
     }
+}
+
+HelelaniIPCamViewer::HelelaniIPCamViewer()
+: m_vlcInst(QStringList()),
+  m_mainMedia("rtsp://10.10.153.9/axis-media/media.amp", &m_vlcInst),
+  m_leftMedia("rtsp://10.10.153.10/axis-media/media.amp", &m_vlcInst),
+  m_rightMedia("rtsp://10.10.153.11/axis-media/media.amp", &m_vlcInst)
+{
+    for (int i=0 ; i<3 ; ++i)
+        m_cameras[i].reset(new VlcMediaPlayer(&m_vlcInst));
 }
 
 void HelelaniIPCamViewer::initPlugin(qt_gui_cpp::PluginContext& context)
@@ -178,18 +214,18 @@ void HelelaniIPCamViewer::initPlugin(qt_gui_cpp::PluginContext& context)
             this, SLOT(rightMenuRequested(QPoint)));
 
     for (int i=0 ; i<3 ; ++i)
-        connect(m_cameras[i].videoCapture(), SIGNAL(frameAvailable(const QtAV::VideoFrame&)),
-                this, SLOT(frameAvailable(const QtAV::VideoFrame&)));
+        connect(m_cameras[i].get(), SIGNAL(snapshotTaken(const QString&)),
+                this, SLOT(frameAvailable(const QString&)));
 
-    startStream(m_cameras[0], m_ui.mainRenderer, "rtsp://10.10.153.9/axis-media/media.amp");
-    startStream(m_cameras[1], m_ui.subRendererLeft, "rtsp://10.10.153.10/axis-media/media.amp");
-    startStream(m_cameras[2], m_ui.subRendererRight, "rtsp://10.10.153.11/axis-media/media.amp");
+    startStream(*m_cameras[0], m_ui.mainRenderer, &m_mainMedia);
+    startStream(*m_cameras[1], m_ui.subRendererLeft, &m_leftMedia);
+    startStream(*m_cameras[2], m_ui.subRendererRight, &m_rightMedia);
 }
 
 void HelelaniIPCamViewer::shutdownPlugin()
 {
-    for (QtAV::AVPlayer& player : m_cameras)
-        player.stop();
+    for (auto& player : m_cameras)
+        player->stop();
 }
 
 void HelelaniIPCamViewer::saveSettings(qt_gui_cpp::Settings& plugin_settings,

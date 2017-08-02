@@ -7,6 +7,7 @@
 #include <ros/node_handle.h>
 #include <helelani_common/Imu.h>
 #include <helelani_common/Motor.h>
+#include <sensor_msgs/NavSatFix.h>
 #include "ui_HelelaniIMU.h"
 #include <mutex>
 
@@ -25,6 +26,7 @@ public:
     void imuCallback(const helelani_common::Imu& message);
     void leftMotorCallback(const helelani_common::Motor& message);
     void rightMotorCallback(const helelani_common::Motor& message);
+    void navSatCallback(const sensor_msgs::NavSatFix& message);
 
 signals:
     void imuUpdated();
@@ -41,9 +43,12 @@ private:
     float m_leftSpeed = 0.f;
     float m_rightSpeed = 0.f;
     float m_startRotations = 0.f;
+    double m_latitude = 0.0;
+    double m_longitude = 0.0;
     ros::Subscriber m_imuSub;
     ros::Subscriber m_leftMotorSub;
     ros::Subscriber m_rightMotorSub;
+    ros::Subscriber m_navSatSub;
     Ui::HelelaniIMU m_ui;
     QWidget* m_widget = nullptr;
 };

@@ -1,15 +1,15 @@
 #ifndef SUBVIDEORENDERERWIDGET_H
 #define SUBVIDEORENDERERWIDGET_H
 
-#include <QtAVWidgets/GLWidgetRenderer2.h>
+#include <VLCQtWidgets/WidgetVideo.h>
 
-class SubVideoRendererWidget : public QtAV::GLWidgetRenderer2
+class SubVideoRendererWidget : public VlcWidgetVideo
 {
     Q_OBJECT
 
 public:
     explicit SubVideoRendererWidget(QWidget* parent = 0)
-    : QtAV::GLWidgetRenderer2(parent)
+    : VlcWidgetVideo(parent)
     {
         QSizePolicy policy = sizePolicy();
         policy.setHeightForWidth(true);
@@ -18,12 +18,13 @@ public:
 
     int heightForWidth(int width) const override
     {
+        printf("HFW %d\n", width * 9 / 16);
         return width * 9 / 16;
     }
 
     void mousePressEvent(QMouseEvent* ev) override
     {
-        QtAV::GLWidgetRenderer2::mousePressEvent(ev);
+        VlcWidgetVideo::mousePressEvent(ev);
         emit clicked(this, ev);
     }
 

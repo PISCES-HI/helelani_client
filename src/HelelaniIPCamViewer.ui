@@ -14,39 +14,53 @@
    <string>Helelani IP Camera Viewer</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="SubVideoRendererWidget" name="subRendererLeft" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="SubVideoRendererWidget" name="subRendererRight" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
    <item row="0" column="0">
-    <widget class="QtAV::GLWidgetRenderer2" name="mainRenderer" native="true">
+    <widget class="VlcWidgetVideo" name="mainRenderer">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="SubVideoRendererWidget" name="subRendererLeft" native="true"/>
-     </item>
-     <item>
-      <widget class="SubVideoRendererWidget" name="subRendererRight" native="true"/>
-     </item>
-    </layout>
-   </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QtAV::GLWidgetRenderer2</class>
-   <extends>QWidget</extends>
-   <header location="global">QtAVWidgets/GLWidgetRenderer2.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>SubVideoRendererWidget</class>
    <extends>QWidget</extends>
    <header>SubVideoRendererWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>VlcWidgetVideo</class>
+   <extends>QFrame</extends>
+   <header location="global">VLCQtWidgets/WidgetVideo.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
