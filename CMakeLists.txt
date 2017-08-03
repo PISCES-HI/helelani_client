@@ -24,11 +24,10 @@ catkin_package(
 
 set(CMAKE_AUTOMOC ON)
 find_package(Qt4 COMPONENTS QtCore QtGui QtSvg REQUIRED)
-#include(cmake/FindQtAV.cmake)
-#if(NOT ${QtAV_FOUND})
-#  message(FATAL_ERROR "QtAV must be installed")
-#endif()
-find_package(VLCQt REQUIRED COMPONENTS Widgets)
+include(cmake/FindQtAV.cmake)
+if(NOT ${QtAV_FOUND})
+  message(FATAL_ERROR "QtAV must be installed")
+endif()
 include(${QT_USE_FILE})
 set(QT_LIBRARIES ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTSVG_LIBRARY})
 
@@ -66,8 +65,7 @@ add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EX
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${QT_LIBRARIES}
-                      #${QTAV_LIBRARIES} ${QTAVWIDGETS_LIBRARIES}
-        VLCQt::Widgets VLCQt::Core vlccore vlc
+                      ${QTAV_LIBRARIES} ${QTAVWIDGETS_LIBRARIES}
 )
 
 #############
