@@ -20,6 +20,7 @@ class CameraControlWidget : public QWidget
     double m_angleBias = 0.0;
     double m_angle = 0.0;
     int m_pitch = 0;
+    int m_exposure = 0;
     bool m_mouseDown = false;
     void doAngleSet(QMouseEvent* ev);
     void doSignal();
@@ -38,6 +39,7 @@ signals:
 
 public slots:
     void pitchSliderChanged(int value);
+    void exposureSliderChanged(int value);
 };
 
 #endif //CAMERACONTROLWIDGET_H

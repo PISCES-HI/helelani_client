@@ -29,6 +29,8 @@ void HelelaniCameraControl::initPlugin(qt_gui_cpp::PluginContext& context)
     connect(m_ui.rightHeading, SIGNAL(camUpdate(const helelani_common::CameraCtrl&)),
             this, SLOT(stereoUpdate(const helelani_common::CameraCtrl&)));
     connect(m_ui.captureStereo, SIGNAL(clicked()), this, SLOT(stereoCapture()));
+    connect(m_ui.exposureSlider, SIGNAL(valueChanged(int)),
+            m_ui.rightHeading, SLOT(exposureSliderChanged(int)));
     m_widget->setObjectName("HelelaniCameraControl");
     if (context.serialNumber() > 1)
         m_widget->setWindowTitle(m_widget->windowTitle() +

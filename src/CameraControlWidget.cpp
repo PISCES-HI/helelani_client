@@ -92,6 +92,7 @@ void CameraControlWidget::doSignal()
     helelani_common::CameraCtrl msg;
     msg.pan = float((m_angle - m_angleBias) * 180.0 / M_PI) + 90.f;
     msg.tilt = float(m_pitch + 90);
+    msg.exposure = float(m_exposure);
     emit camUpdate(msg);
 }
 
@@ -115,6 +116,13 @@ void CameraControlWidget::mouseReleaseEvent(QMouseEvent*)
 void CameraControlWidget::pitchSliderChanged(int value)
 {
     m_pitch = value;
+    update();
+    doSignal();
+}
+
+void CameraControlWidget::exposureSliderChanged(int value)
+{
+    m_exposure = value;
     update();
     doSignal();
 }
