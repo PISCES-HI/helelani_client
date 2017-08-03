@@ -77,20 +77,20 @@ void HelelaniIMU::updateImuUI()
         auto deg = int(m_latitude);
         double minSec = std::abs(m_latitude - deg) * 60.0;
         auto min = int(minSec);
-        auto sec = int((minSec - min) * 60.0);
+        double sec = (minSec - min) * 60.0;
         m_ui.latDeg->display(deg);
         m_ui.latMin->display(min);
-        m_ui.latSec->display(sec);
+        m_ui.latSec->display(QString::number(sec, 'f', 1));
     }
 
     {
         auto deg = int(m_longitude);
         double minSec = std::abs(m_longitude - deg) * 60.0;
         auto min = int(minSec);
-        auto sec = int((minSec - min) * 60.0);
+        double sec = (minSec - min) * 60.0;
         m_ui.lonDeg->display(deg);
         m_ui.lonMin->display(min);
-        m_ui.lonSec->display(sec);
+        m_ui.lonSec->display(QString::number(sec, 'f', 1));
     }
 }
 
