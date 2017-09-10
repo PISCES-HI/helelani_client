@@ -1,7 +1,7 @@
 #include "HelelaniIMU.h"
 #include <pluginlib/class_list_macros.h>
 #include <helelani_common/helelani_common.h>
-#include <QtGui/QMenu>
+#include <QMenu>
 
 static void InitResources() { Q_INIT_RESOURCE(resources); }
 static void CleanupResources() { Q_CLEANUP_RESOURCE(resources); }

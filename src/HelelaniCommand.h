@@ -1,16 +1,16 @@
 #ifndef HELELANICOMMAND_HPP
 #define HELELANICOMMAND_HPP
 
-#include <QtGui/QMainWindow>
-#include <QtCore/QtCore>
-#include <QtCore/QAbstractItemModel>
-#include <QtGui/QCompleter>
-#include <QtGui/QTableWidgetItem>
+#include <QMainWindow>
+#include <QtCore>
+#include <QAbstractItemModel>
+#include <QCompleter>
+#include <QTableWidgetItem>
 #include <rqt_gui_cpp/plugin.h>
 #include <ros/node_handle.h>
 #include "ui_HelelaniCommand.h"
 #include <mutex>
-#include <QtGui/QListView>
+#include <QListView>
 #include <helelani_common/DriveCommand.h>
 #include <helelani_common/Mission.h>
 

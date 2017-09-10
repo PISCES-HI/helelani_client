@@ -1,7 +1,7 @@
 #ifndef DRIVETRACKPAD_H
 #define DRIVETRACKPAD_H
 
-#include <QtGui/QGroupBox>
+#include <QGroupBox>
 
 class DriveTrackpad : public QGroupBox
 {

@@ -1,8 +1,8 @@
 #include "HelelaniIPCamViewer.h"
 #include <pluginlib/class_list_macros.h>
-#include <QtGui/QMenu>
-#include <QtGui/QFileDialog>
-#include <QtGui/QMouseEvent>
+#include <QMenu>
+#include <QFileDialog>
+#include <QMouseEvent>
 #include <VLCQtCore/Video.h>
 
 namespace helelani_client {

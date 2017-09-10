@@ -1,9 +1,9 @@
 #ifndef COMMANDLINEEDIT_H
 #define COMMANDLINEEDIT_H
 
-#include <QtGui/QLineEdit>
-#include <QtGui/QApplication>
-#include <QtGui/QCompleter>
+#include <QLineEdit>
+#include <QApplication>
+#include <QCompleter>
 
 class CommandLineEdit : public QLineEdit
 {

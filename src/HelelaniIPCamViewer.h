@@ -1,15 +1,15 @@
 #ifndef HELELANIIPCAMVIEWER_HPP
 #define HELELANIIPCAMVIEWER_HPP
 
-#include <QtGui/QMainWindow>
-#include <QtCore/QtCore>
-#include <QtCore/QAbstractItemModel>
-#include <QtGui/QCompleter>
+#include <QMainWindow>
+#include <QtCore>
+#include <QAbstractItemModel>
+#include <QCompleter>
 #include <rqt_gui_cpp/plugin.h>
 #include <ros/node_handle.h>
 #include "ui_HelelaniIPCamViewer.h"
 #include <mutex>
-#include <QtGui/QListView>
+#include <QListView>
 #include <VLCQtCore/Instance.h>
 #include <VLCQtCore/MediaPlayer.h>
 #include <VLCQtWidgets/WidgetVideo.h>

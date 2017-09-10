@@ -2,7 +2,7 @@
 #define ATTITUDEWIDGET_H
 
 #include <QtSvg/QSvgRenderer>
-#include <QtGui/QWidget>
+#include <QWidget>
 
 class AttitudeWidget : public QWidget
 {

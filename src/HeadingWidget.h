@@ -1,8 +1,8 @@
 #ifndef HEADINGWIDGET_H
 #define HEADINGWIDGET_H
 
-#include <QtSvg/QSvgRenderer>
-#include <QtGui/QWidget>
+#include <QSvgRenderer>
+#include <QWidget>
 
 class HeadingWidget : public QWidget
 {

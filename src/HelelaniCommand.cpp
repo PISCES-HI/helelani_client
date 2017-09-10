@@ -1,6 +1,6 @@
 #include "HelelaniCommand.h"
 #include <pluginlib/class_list_macros.h>
-#include <QtGui/QMenu>
+#include <QMenu>
 
 namespace helelani_client {
 

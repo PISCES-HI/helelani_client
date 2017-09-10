@@ -1,8 +1,8 @@
 #ifndef HELELANIIMU_HPP
 #define HELELANIIMU_HPP
 
-#include <QtGui/QMainWindow>
-#include <QtCore/QtCore>
+#include <QMainWindow>
+#include <QtCore>
 #include <rqt_gui_cpp/plugin.h>
 #include <ros/node_handle.h>
 #include <helelani_common/Imu.h>

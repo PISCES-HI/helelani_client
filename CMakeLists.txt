@@ -23,14 +23,15 @@ catkin_package(
 ###########
 
 set(CMAKE_AUTOMOC ON)
-find_package(Qt4 COMPONENTS QtCore QtGui QtSvg REQUIRED)
+find_package(Qt5Core REQUIRED)
+find_package(Qt5Gui REQUIRED)
+find_package(Qt5Svg REQUIRED)
 #include(cmake/FindQtAV.cmake)
 #if(NOT ${QtAV_FOUND})
 #  message(FATAL_ERROR "QtAV must be installed")
 #endif()
 find_package(VLCQt REQUIRED COMPONENTS Widgets)
-include(${QT_USE_FILE})
-set(QT_LIBRARIES ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTSVG_LIBRARY})
+set(QT_LIBRARIES Qt5::Core Qt5::Gui Qt5::Svg)
 
 set(WORKSPACE_INCLUDES "")
 foreach(f ${CATKIN_WORKSPACES})
@@ -42,12 +43,13 @@ include_directories(src
                     ${catkin_INCLUDE_DIRS}
                     ${WORKSPACE_INCLUDES}
                     ${QTAV_INCLUDE_DIRS}
-                    ${QTAVWIDGETS_INCLUDE_DIRS})
+                    ${QTAVWIDGETS_INCLUDE_DIRS}
+                    ${QTSVG_INCLUDE_DIRS})
 
-QT4_WRAP_UI(UI_GENERATED_HEADERS src/HelelaniIMU.ui src/HelelaniCommand.ui
+QT5_WRAP_UI(UI_GENERATED_HEADERS src/HelelaniIMU.ui src/HelelaniCommand.ui
             src/HelelaniIPCamViewer.ui src/HelelaniCameraControl.ui
             src/HelelaniMissionControlClient.ui src/HelelaniThrottlePad.ui)
-QT4_ADD_RESOURCES(RES_SOURCES resources/resources.qrc)
+QT5_ADD_RESOURCES(RES_SOURCES resources/resources.qrc)
 add_library(${PROJECT_NAME} ${UI_GENERATED_HEADERS} ${RES_SOURCES}
             src/HelelaniIMU.cpp src/HelelaniIMU.h
             src/AttitudeWidget.cpp src/AttitudeWidget.h

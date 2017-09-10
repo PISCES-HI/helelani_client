@@ -1,10 +1,10 @@
 #ifndef HELELANIMISSIONCONTROLCLIENT_HPP
 #define HELELANIMISSIONCONTROLCLIENT_HPP
 
-#include <QtGui/QMainWindow>
-#include <QtCore/QtCore>
-#include <QtGui/QIntValidator>
-#include <QtGui/QDoubleValidator>
+#include <QMainWindow>
+#include <QtCore>
+#include <QIntValidator>
+#include <QDoubleValidator>
 #include <rqt_gui_cpp/plugin.h>
 #include <ros/ros.h>
 #include <helelani_common/Mission.h>

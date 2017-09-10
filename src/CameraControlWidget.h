@@ -1,9 +1,9 @@
 #ifndef CAMERACONTROLWIDGET_H
 #define CAMERACONTROLWIDGET_H
 
-#include <QtSvg/QSvgRenderer>
-#include <QtGui/QWidget>
-#include <QtGui/QSlider>
+#include <QSvgRenderer>
+#include <QWidget>
+#include <QSlider>
 #include <helelani_common/CameraCtrl.h>
 
 class CameraControlWidget : public QWidget
