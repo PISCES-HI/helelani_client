@@ -25,12 +25,14 @@ public slots:
     void situationUpdate(const helelani_common::CameraCtrl& msg);
     void stereoUpdate(const helelani_common::CameraCtrl& msg);
     void stereoCapture();
+    void lidarPitchSliderChanged(int value);
 
 private:
     Ui::HelelaniCameraControl m_ui;
     QWidget* m_widget = nullptr;
     ros::Publisher m_situationCamPub;
     ros::Publisher m_stereoCamPub;
+    ros::Publisher m_lidarCamPub;
     ros::ServiceClient m_stereoImageRequest;
 };
 

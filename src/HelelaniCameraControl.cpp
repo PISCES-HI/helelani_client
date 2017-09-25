@@ -1,6 +1,7 @@
 #include "HelelaniCameraControl.h"
 #include <pluginlib/class_list_macros.h>
 #include <std_srvs/Empty.h>
+#include <std_msgs/Float32.h>
 
 static void InitResources() { Q_INIT_RESOURCE(resources); }
 static void CleanupResources() { Q_CLEANUP_RESOURCE(resources); }
@@ -17,6 +18,8 @@ void HelelaniCameraControl::initPlugin(qt_gui_cpp::PluginContext& context)
     m_widget = new QWidget();
     // extend the widget with all attributes and children from UI file
     m_ui.setupUi(m_widget);
+    connect(m_ui.lidarPitch, SIGNAL(valueChanged(int)),
+            this, SLOT(lidarPitchSliderChanged(int)));
     m_ui.leftHeading->setName("Situation Cam");
     connect(m_ui.leftPitch, SIGNAL(valueChanged(int)),
             m_ui.leftHeading, SLOT(pitchSliderChanged(int)));
@@ -43,6 +46,8 @@ void HelelaniCameraControl::initPlugin(qt_gui_cpp::PluginContext& context)
             ("/helelani/situation_cam_ctrl", 1000);
     m_stereoCamPub = rosNode.advertise<helelani_common::CameraCtrl>
             ("/helelani/stereo_cam_ctrl", 1000);
+    m_lidarCamPub = rosNode.advertise<std_msgs::Float32>
+            ("/helelani/lidar_ctrl", 1000);
     m_stereoImageRequest = rosNode.serviceClient<std_srvs::Empty>
             ("/helelani/stereo_image_request");
 }
@@ -81,6 +86,13 @@ void HelelaniCameraControl::stereoCapture()
 {
     std_srvs::Empty empty;
     m_stereoImageRequest.call(empty);
+}
+
+void HelelaniCameraControl::lidarPitchSliderChanged(int value)
+{
+    std_msgs::Float32 msg;
+    msg.data = value + 90;
+    m_lidarCamPub.publish(msg);
 }
 
 }
