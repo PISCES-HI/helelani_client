@@ -175,7 +175,7 @@ void HelelaniIPCamViewer::subVideoClicked(SubVideoRendererWidget* src, QMouseEve
 }
 
 HelelaniIPCamViewer::HelelaniIPCamViewer()
-: m_vlcInst(QStringList()),
+: m_vlcInst({"--network-caching=500"}),
   m_mainMedia("rtsp://10.10.153.9/axis-media/media.amp", &m_vlcInst),
   m_leftMedia("rtsp://10.10.153.10/axis-media/media.amp", &m_vlcInst),
   m_rightMedia("rtsp://10.10.153.11/axis-media/media.amp", &m_vlcInst)
