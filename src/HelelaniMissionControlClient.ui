@@ -19,10 +19,221 @@
      <property name="enabled">
       <bool>false</bool>
      </property>
+     <property name="toolTip">
+      <string>Mission Timer</string>
+     </property>
      <property name="digitCount">
       <number>9</number>
      </property>
     </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="3">
+      <widget class="QLabel" name="label_8">
+       <property name="toolTip">
+        <string>24V Current</string>
+       </property>
+       <property name="text">
+        <string>24A:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="4">
+      <widget class="QLCDNumber" name="ampLeft">
+       <property name="toolTip">
+        <string>Left Motor Current</string>
+       </property>
+       <property name="segmentStyle">
+        <enum>QLCDNumber::Flat</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="7">
+      <widget class="QLCDNumber" name="tempRight">
+       <property name="toolTip">
+        <string>Right Motor Temperature</string>
+       </property>
+       <property name="segmentStyle">
+        <enum>QLCDNumber::Flat</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLCDNumber" name="volt12">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>12V Voltage</string>
+       </property>
+       <property name="segmentStyle">
+        <enum>QLCDNumber::Flat</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="7">
+      <widget class="QLabel" name="label_10">
+       <property name="toolTip">
+        <string>Right Motor Temperature</string>
+       </property>
+       <property name="text">
+        <string>RT:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="4">
+      <widget class="QLabel" name="label_9">
+       <property name="toolTip">
+        <string>Left Motor Current</string>
+       </property>
+       <property name="text">
+        <string>LA:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="5">
+      <widget class="QLabel" name="label_12">
+       <property name="toolTip">
+        <string>Right Motor Current</string>
+       </property>
+       <property name="text">
+        <string>RA:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="label_7">
+       <property name="toolTip">
+        <string>48V Voltage</string>
+       </property>
+       <property name="text">
+        <string>48V:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QLCDNumber" name="amp24">
+       <property name="toolTip">
+        <string>24V Current</string>
+       </property>
+       <property name="segmentStyle">
+        <enum>QLCDNumber::Flat</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="8">
+      <widget class="QLabel" name="label_11">
+       <property name="toolTip">
+        <string>Electronics Box Temperature</string>
+       </property>
+       <property name="text">
+        <string>BT:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLCDNumber" name="amp12">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>12V Current</string>
+       </property>
+       <property name="segmentStyle">
+        <enum>QLCDNumber::Flat</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_5">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>12V Voltage</string>
+       </property>
+       <property name="text">
+        <string>12V:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="8">
+      <widget class="QLCDNumber" name="tempBox">
+       <property name="toolTip">
+        <string>Electronics Box Temperature</string>
+       </property>
+       <property name="segmentStyle">
+        <enum>QLCDNumber::Flat</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QLCDNumber" name="volt48">
+       <property name="toolTip">
+        <string>48V Voltage</string>
+       </property>
+       <property name="segmentStyle">
+        <enum>QLCDNumber::Flat</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="label_6">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>12V Current</string>
+       </property>
+       <property name="text">
+        <string>12A:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="6">
+      <widget class="QLabel" name="label_13">
+       <property name="toolTip">
+        <string>Left Motor Temperature</string>
+       </property>
+       <property name="text">
+        <string>LT:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="5">
+      <widget class="QLCDNumber" name="ampRight">
+       <property name="toolTip">
+        <string>Right Motor Current</string>
+       </property>
+       <property name="segmentStyle">
+        <enum>QLCDNumber::Flat</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="6">
+      <widget class="QLCDNumber" name="tempLeft">
+       <property name="toolTip">
+        <string>Left Motor Temperature</string>
+       </property>
+       <property name="segmentStyle">
+        <enum>QLCDNumber::Flat</enum>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout">

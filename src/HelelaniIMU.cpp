@@ -29,7 +29,10 @@ void HelelaniIMU::initPlugin(qt_gui_cpp::PluginContext& context)
                      this, SLOT(updateImuUI()));
 
     m_ui.distanceNumber->setContextMenuPolicy(Qt::CustomContextMenu);
+    m_ui.rotationsNumber->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_ui.distanceNumber, SIGNAL(customContextMenuRequested(QPoint)),
+            this, SLOT(distanceMenuRequested(QPoint)));
+    connect(m_ui.rotationsNumber, SIGNAL(customContextMenuRequested(QPoint)),
             this, SLOT(distanceMenuRequested(QPoint)));
 
     ros::NodeHandle rosNode;
@@ -73,6 +76,7 @@ void HelelaniIMU::updateImuUI()
                                  (m_wheelDiameter, avgRotations - m_startRotations), 'f', 1));
     float avgSpeed = helelani_common::RotationsToMeters(m_wheelDiameter, (m_leftSpeed + m_rightSpeed) / 2.f) / 60.f;
     m_ui.speedNumber->display(QString::number(avgSpeed, 'f', 2));
+    m_ui.rotationsNumber->display(QString::number(avgRotations - m_startRotations, 'f', 2));
 
     {
         auto deg = int(m_latitude);

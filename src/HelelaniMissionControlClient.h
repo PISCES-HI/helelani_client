@@ -9,6 +9,8 @@
 #include <ros/ros.h>
 #include <helelani_common/Mission.h>
 #include <helelani_common/MissionStart.h>
+#include <helelani_common/Analog.h>
+#include <helelani_common/Motor.h>
 #include "ui_HelelaniMissionControlClient.h"
 #include <mutex>
 
@@ -21,6 +23,38 @@ class MissionUpdateEvent : public QEvent
 public:
     MissionUpdateEvent(const helelani_common::Mission& msg)
     : QEvent(Type(int(Type::User) + 11)), m_msg(msg) {}
+};
+
+class AnalogUpdateEvent : public QEvent
+{
+    friend class HelelaniMissionControlClient;
+    helelani_common::Analog m_msg;
+public:
+    AnalogUpdateEvent(const helelani_common::Analog& msg)
+            : QEvent(Type(int(Type::User) + 12)), m_msg(msg) {}
+};
+
+class MotorUpdateEvent : public QEvent
+{
+    friend class HelelaniMissionControlClient;
+    helelani_common::Motor m_msg;
+public:
+    MotorUpdateEvent(QEvent::Type tp, const helelani_common::Motor& msg)
+            : QEvent(tp), m_msg(msg) {}
+};
+
+class LeftMotorUpdateEvent : public MotorUpdateEvent
+{
+public:
+    LeftMotorUpdateEvent(const helelani_common::Motor& msg)
+            : MotorUpdateEvent(Type(int(Type::User) + 13), msg) {}
+};
+
+class RightMotorUpdateEvent : public MotorUpdateEvent
+{
+public:
+    RightMotorUpdateEvent(const helelani_common::Motor& msg)
+            : MotorUpdateEvent(Type(int(Type::User) + 14), msg) {}
 };
 
 class HelelaniMissionControlClient : public rqt_gui_cpp::Plugin
@@ -45,8 +79,14 @@ private:
     QDoubleValidator m_doubleValidator;
 
     void _missionUpdate(const helelani_common::Mission& msg);
+    void _analogUpdate(const helelani_common::Analog& msg);
+    void _leftMotorUpdate(const helelani_common::Motor& msg);
+    void _rightMotorUpdate(const helelani_common::Motor& msg);
 
     ros::Subscriber m_missionSub;
+    ros::Subscriber m_analogSub;
+    ros::Subscriber m_leftMotorSub;
+    ros::Subscriber m_rightMotorSub;
     ros::ServiceClient m_startMission;
     ros::ServiceClient m_endMission;
 

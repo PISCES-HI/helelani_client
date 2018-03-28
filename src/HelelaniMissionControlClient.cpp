@@ -34,6 +34,12 @@ void HelelaniMissionControlClient::initPlugin(qt_gui_cpp::PluginContext& context
     ros::NodeHandle n;
     m_missionSub = n.subscribe("/helelani/mission", 10,
                                &HelelaniMissionControlClient::_missionUpdate, this);
+    m_analogSub = n.subscribe("/helelani/analog", 10,
+                              &HelelaniMissionControlClient::_analogUpdate, this);
+    m_leftMotorSub = n.subscribe("/helelani/left_motor", 10,
+                                 &HelelaniMissionControlClient::_leftMotorUpdate, this);
+    m_rightMotorSub = n.subscribe("/helelani/right_motor", 10,
+                                  &HelelaniMissionControlClient::_rightMotorUpdate, this);
     m_startMission = n.serviceClient<helelani_common::MissionStart>("/helelani/start_mission");
     m_endMission = n.serviceClient<std_srvs::Empty>("/helelani/end_mission");
 }
@@ -41,6 +47,9 @@ void HelelaniMissionControlClient::initPlugin(qt_gui_cpp::PluginContext& context
 void HelelaniMissionControlClient::shutdownPlugin()
 {
     m_missionSub.shutdown();
+    m_analogSub.shutdown();
+    m_leftMotorSub.shutdown();
+    m_rightMotorSub.shutdown();
     m_startMission.shutdown();
     m_endMission.shutdown();
 }
@@ -101,6 +110,30 @@ void HelelaniMissionControlClient::customEvent(QEvent* ev)
             m_state = State::Started;
         }
     }
+    else if (ev->type() == QEvent::Type::User + 12)
+    {
+        auto aue = static_cast<AnalogUpdateEvent*>(ev);
+        helelani_common::Analog& msg = aue->m_msg;
+        m_ui.volt12->display(QString::number(msg.voltage_12, 'f', 2));
+        m_ui.amp12->display(QString::number(msg.current_12, 'f', 2));
+        m_ui.volt48->display(QString::number(msg.voltage_48, 'f', 2));
+        m_ui.amp24->display(QString::number(msg.current_24, 'f', 2));
+        m_ui.tempLeft->display(QString::number(msg.temp_l, 'f', 2));
+        m_ui.tempRight->display(QString::number(msg.temp_r, 'f', 2));
+        m_ui.tempBox->display(QString::number(msg.temp_box, 'f', 2));
+    }
+    else if (ev->type() == QEvent::Type::User + 13)
+    {
+        auto mue = static_cast<MotorUpdateEvent*>(ev);
+        helelani_common::Motor& msg = mue->m_msg;
+        m_ui.ampLeft->display(QString::number(msg.current, 'f', 2));
+    }
+    else if (ev->type() == QEvent::Type::User + 14)
+    {
+        auto mue = static_cast<MotorUpdateEvent*>(ev);
+        helelani_common::Motor& msg = mue->m_msg;
+        m_ui.ampRight->display(QString::number(msg.current, 'f', 2));
+    }
 }
 
 void HelelaniMissionControlClient::startClicked()
@@ -122,6 +155,21 @@ void HelelaniMissionControlClient::endClicked()
 void HelelaniMissionControlClient::_missionUpdate(const helelani_common::Mission& msg)
 {
     QApplication::postEvent(this, new MissionUpdateEvent(msg));
+}
+
+void HelelaniMissionControlClient::_analogUpdate(const helelani_common::Analog& msg)
+{
+    QApplication::postEvent(this, new AnalogUpdateEvent(msg));
+}
+
+void HelelaniMissionControlClient::_leftMotorUpdate(const helelani_common::Motor& msg)
+{
+    QApplication::postEvent(this, new LeftMotorUpdateEvent(msg));
+}
+
+void HelelaniMissionControlClient::_rightMotorUpdate(const helelani_common::Motor& msg)
+{
+    QApplication::postEvent(this, new RightMotorUpdateEvent(msg));
 }
 
 }
