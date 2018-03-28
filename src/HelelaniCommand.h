@@ -446,19 +446,67 @@ public:
     }
 };
 
+class ConfigTypeArg : public CommandItem
+{
+    ArgumentEnum m_diameter;
+public:
+    ConfigTypeArg(CommandItem* parent, CommandItem* next) :
+            CommandItem(0, parent, next),
+            m_diameter(0, parent, next, "diameter") {}
+    bool forward() const override { return true; }
+    int rowCount() const override { return 1; }
+    CommandItem* index(int row) override
+    {
+        switch (row)
+        {
+            case 0:
+                return &m_diameter;
+            default:
+                return nullptr;
+        }
+    }
+    static uint8_t DirEnum(const QString& str)
+    {
+        if (!str.compare("diameter", Qt::CaseInsensitive))
+            return helelani_common::DriveCommand::CONFIG_DIAMETER;
+        return helelani_common::DriveCommand::CONFIG_DIAMETER;
+    }
+};
+
+class ConfigCommand : public CommandItem
+{
+    ConfigTypeArg m_type;
+    NumberArg m_val;
+public:
+    ConfigCommand(int row, CommandItem* parent) :
+            CommandItem(row, parent, &m_type),
+            m_type(this, &m_val),
+            m_val(&m_type, nullptr) {}
+    QVariant data() const { return "config"; }
+    void toMsg(helelani_common::DriveCommand& msg,
+               const QStringList& args) const
+    {
+        msg.cmd = helelani_common::DriveCommand::CMD_CONFIG;
+        msg.config = ConfigTypeArg::DirEnum(args[1]);
+        msg.value = args[2].toFloat();
+    }
+};
+
 class RootCommand : public CommandItem
 {
     DriveCommand m_drive;
     TurnCommand m_turn;
     SadlCommand m_sadl;
     KillCommand m_kill;
+    ConfigCommand m_config;
 public:
     RootCommand() : CommandItem(0, nullptr, nullptr),
                     m_drive(0, this),
                     m_turn(1, this),
                     m_sadl(2, this),
-                    m_kill(3, this) {}
-    int rowCount() const override { return 4; }
+                    m_kill(3, this),
+                    m_config(4, this){}
+    int rowCount() const override { return 5; }
     CommandItem* index(int row) override
     {
         switch (row)
@@ -471,6 +519,8 @@ public:
             return &m_sadl;
         case 3:
             return &m_kill;
+        case 4:
+            return &m_config;
         default:
             return nullptr;
         }
@@ -644,6 +694,7 @@ public:
 
 public slots:
     void runCommand();
+    void killCommand();
     void cellChanged(int row, int column);
     void updateTick();
     void tableMenuRequested(QPoint pt);

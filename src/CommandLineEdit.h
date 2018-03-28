@@ -4,6 +4,7 @@
 #include <QLineEdit>
 #include <QApplication>
 #include <QCompleter>
+#include <QKeyEvent>
 
 class CommandLineEdit : public QLineEdit
 {
@@ -29,6 +30,16 @@ public:
         // force completion after text is deleted
         completer()->complete();
     }
+
+    void keyPressEvent(QKeyEvent* e) override
+    {
+        if (e->key() == Qt::Key_Escape)
+            emit escapePressed();
+        QLineEdit::keyPressEvent(e);
+    }
+
+Q_SIGNALS:
+    void escapePressed();
 
 public slots:
     void slotTextEdited()

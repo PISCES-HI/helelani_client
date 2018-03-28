@@ -27,6 +27,8 @@ void HelelaniCommand::initPlugin(qt_gui_cpp::PluginContext& context)
 
     connect(m_ui.commandEdit, SIGNAL(returnPressed()),
             this, SLOT(runCommand()));
+    connect(m_ui.commandEdit, SIGNAL(escapePressed()),
+            this, SLOT(killCommand()));
     m_ui.commandEdit->setCompleter(&m_cmdCompleter);
     m_ui.commandEdit->setValidator(&m_cmdValidator);
 
@@ -132,6 +134,13 @@ void HelelaniCommand::runCommand()
     QApplication::postEvent(this, new CommandSubmitEvent(msg));
 }
 
+void HelelaniCommand::killCommand()
+{
+    auto msg = boost::make_shared<helelani_common::DriveCommand>();
+    msg->cmd = helelani_common::DriveCommand::CMD_KILL;
+    QApplication::postEvent(this, new CommandSubmitEvent(msg));
+}
+
 void HelelaniCommand::cellChanged(int row, int column)
 {
     m_ui.commandEdit->clear();
@@ -166,7 +175,10 @@ void HelelaniCommand::customEvent(QEvent* e)
         m_ui.commandTable->setItem(row, 0, new QTableWidgetItem(QIcon::fromTheme("go-jump"), "Command"));
         m_ui.commandTable->setItem(row, 1, new QTableWidgetItem(TimeString(m_elapsedSeconds)));
         m_ui.commandTable->setItem(row, 2, new CommandTimerWidgetItem(evc->m_msg, m_delayUp, m_delayDown));
-        m_ui.commandTable->setItem(row, 3, new QTableWidgetItem(m_ui.commandEdit->text().trimmed()));
+        if (evc->m_msg->cmd == helelani_common::DriveCommand::CMD_KILL)
+            m_ui.commandTable->setItem(row, 3, new QTableWidgetItem("kill"));
+        else
+            m_ui.commandTable->setItem(row, 3, new QTableWidgetItem(m_ui.commandEdit->text().trimmed()));
         m_ui.commandEdit->clear();
 
         if (evc->m_msg->cmd == helelani_common::DriveCommand::CMD_KILL)

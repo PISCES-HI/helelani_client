@@ -37,6 +37,7 @@ void HelelaniIMU::initPlugin(qt_gui_cpp::PluginContext& context)
     m_leftMotorSub = rosNode.subscribe("/helelani/left_motor", 10, &HelelaniIMU::leftMotorCallback, this);
     m_rightMotorSub = rosNode.subscribe("/helelani/right_motor", 10, &HelelaniIMU::rightMotorCallback, this);
     m_navSatSub = rosNode.subscribe("/helelani/nav_sat_fix", 10, &HelelaniIMU::navSatCallback, this);
+    m_wheelDiameterSub = rosNode.subscribe("/helelani/wheel_diameter", 10, &HelelaniIMU::diameterCallback, this);
 }
 
 void HelelaniIMU::shutdownPlugin()
@@ -69,8 +70,8 @@ void HelelaniIMU::updateImuUI()
 
     float avgRotations = (m_leftRotations + m_rightRotations) / 2.f;
     m_ui.distanceNumber->display(QString::number(helelani_common::RotationsToMeters
-                                 (avgRotations - m_startRotations), 'f', 1));
-    float avgSpeed = helelani_common::RotationsToMeters((m_leftSpeed + m_rightSpeed) / 2.f) / 60.f;
+                                 (m_wheelDiameter, avgRotations - m_startRotations), 'f', 1));
+    float avgSpeed = helelani_common::RotationsToMeters(m_wheelDiameter, (m_leftSpeed + m_rightSpeed) / 2.f) / 60.f;
     m_ui.speedNumber->display(QString::number(avgSpeed, 'f', 2));
 
     {
@@ -139,6 +140,11 @@ void HelelaniIMU::navSatCallback(const sensor_msgs::NavSatFix& message)
     m_latitude = message.latitude;
     m_longitude = message.longitude;
     emit imuUpdated();
+}
+
+void HelelaniIMU::diameterCallback(const std_msgs::Float32& message)
+{
+    m_wheelDiameter = message.data;
 }
 
 }
