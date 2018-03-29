@@ -113,6 +113,7 @@ void HelelaniIMU::resetDistance()
     float avgRotations = (m_leftRotations + m_rightRotations) / 2.f;
     m_startRotations = avgRotations;
     m_ui.distanceNumber->display(0.f);
+    m_ui.rotationsNumber->display(0.f);
 }
 
 void HelelaniIMU::imuCallback(const helelani_common::Imu& message)

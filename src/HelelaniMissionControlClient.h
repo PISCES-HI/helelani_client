@@ -11,6 +11,7 @@
 #include <helelani_common/MissionStart.h>
 #include <helelani_common/Analog.h>
 #include <helelani_common/Motor.h>
+#include <helelani_common/Imu.h>
 #include "ui_HelelaniMissionControlClient.h"
 #include <mutex>
 
@@ -57,6 +58,36 @@ public:
             : MotorUpdateEvent(Type(int(Type::User) + 14), msg) {}
 };
 
+class IMUUpdateEvent : public QEvent
+{
+    friend class HelelaniMissionControlClient;
+    helelani_common::Imu m_msg;
+public:
+    IMUUpdateEvent(const helelani_common::Imu& msg)
+            : QEvent(Type(int(Type::User) + 15)), m_msg(msg) {}
+};
+
+struct CSVData
+{
+    QString time;
+    float wheelRot;
+    float leftCurrent;
+    float rightCurrent;
+    float pitch;
+    float roll;
+    float heading;
+    float _12V;
+};
+
+class CSVRecorder
+{
+    QString m_csvString;
+public:
+    CSVRecorder();
+    void addData(const CSVData& data);
+    void writeOut(const QString& path);
+};
+
 class HelelaniMissionControlClient : public rqt_gui_cpp::Plugin
 {
     Q_OBJECT
@@ -77,16 +108,23 @@ private:
     QWidget* m_widget = nullptr;
     QIntValidator m_intValidator;
     QDoubleValidator m_doubleValidator;
+    CSVData m_csvData = {};
+    CSVRecorder m_csv;
+
+    float m_leftRotations = 0.f;
+    float m_rightRotations = 0.f;
 
     void _missionUpdate(const helelani_common::Mission& msg);
     void _analogUpdate(const helelani_common::Analog& msg);
     void _leftMotorUpdate(const helelani_common::Motor& msg);
     void _rightMotorUpdate(const helelani_common::Motor& msg);
+    void _imuUpdate(const helelani_common::Imu& msg);
 
     ros::Subscriber m_missionSub;
     ros::Subscriber m_analogSub;
     ros::Subscriber m_leftMotorSub;
     ros::Subscriber m_rightMotorSub;
+    ros::Subscriber m_imuSub;
     ros::ServiceClient m_startMission;
     ros::ServiceClient m_endMission;
 
