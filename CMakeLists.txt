@@ -48,7 +48,8 @@ include_directories(src
 
 QT5_WRAP_UI(UI_GENERATED_HEADERS src/HelelaniIMU.ui src/HelelaniCommand.ui
             src/HelelaniIPCamViewer.ui src/HelelaniCameraControl.ui
-            src/HelelaniMissionControlClient.ui src/HelelaniThrottlePad.ui)
+            src/HelelaniMissionControlClient.ui src/HelelaniThrottlePad.ui
+	    src/HelelaniJoystickControls.ui)
 QT5_ADD_RESOURCES(RES_SOURCES resources/resources.qrc)
 add_library(${PROJECT_NAME} ${UI_GENERATED_HEADERS} ${RES_SOURCES}
             src/HelelaniIMU.cpp src/HelelaniIMU.h
@@ -61,7 +62,9 @@ add_library(${PROJECT_NAME} ${UI_GENERATED_HEADERS} ${RES_SOURCES}
             src/HelelaniMissionControlClient.cpp src/HelelaniMissionControlClient.h
             src/HelelaniThrottlePad.cpp src/HelelaniThrottlePad.h
             src/SVGHelper.h src/SubVideoRendererWidget.h src/CommandLineEdit.h
-            src/DriveTrackpad.cpp src/DriveTrackpad.h)
+            src/DriveTrackpad.cpp src/DriveTrackpad.h
+	    src/DriveGamepad.cpp src/DriveGamepad.h
+	    src/HelelaniJoystickControls.cpp src/HelelaniJoystickControls.h)
 
 ## Add cmake target dependencies of the library
 add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -89,6 +92,7 @@ install(PROGRAMS scripts/helelani_imu scripts/helelani_command
         scripts/helelani_ip_cam scripts/helelani_camera_control
         scripts/helelani_mission_control_client
         scripts/helelani_throttle_pad
+	scripts/helelani_joystick_controls
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

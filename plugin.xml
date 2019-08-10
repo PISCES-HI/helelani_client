@@ -71,4 +71,16 @@
             <statustip>Helelani Throttle Pad</statustip>
         </qtgui>
     </class>
+    <class name="Helelani Joystick Controls" type="helelani_client::HelelaniJoystickControls" base_class_type="rqt_gui_cpp::Plugin">
+        <description>Helelani Joystick Controls</description>
+        <qtgui>
+            <group>
+                <label>Helelani</label>
+                <icon type="theme">folder</icon>
+                <statustip>Plugins related to PISCES Helelani.</statustip>
+            </group>
+            <label>Helelani Joystick Controls</label>
+            <statustip>Helelani Joystick Controls</statustip>
+        </qtgui>
+    </class>
 </library>
