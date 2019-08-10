@@ -18,7 +18,11 @@ scripts/your_pluggin (in install())
 src/YourPluggin.ui (in QT5_WRAP_UI() *if* implementing a GUI)
 
 ## plugin.xml: (if adding client code)
-*Within <library path="lib/libhelelani_client"> </library>, add:*
+*Within:*
+
+<library path="lib/libhelelani_client"> </library>
+
+*add:*
   
   <class name="Helelani Your Plugin" type="helelani_client::HelelaniYourPlugin" base_class_type="rqt_gui_cpp::Plugin">
         
