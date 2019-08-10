@@ -3,5 +3,62 @@
         <file>Attitude_indicator_level_flight.svg</file>
         <file>Heading_indicator.svg</file>
         <file>Camera_control.svg</file>
+
+	<file>buttons/360_A_pressed.png</file>
+	<file>buttons/360_A_unpressed.png</file>
+	<file>buttons/360_A_disabled.png</file>
+	<file>buttons/360_B_pressed.png</file>
+	<file>buttons/360_B_unpressed.png</file>
+	<file>buttons/360_B_disabled.png</file>
+	<file>buttons/360_X_pressed.png</file>
+	<file>buttons/360_X_unpressed.png</file>
+	<file>buttons/360_X_disabled.png</file>
+	<file>buttons/360_Y_pressed.png</file>
+	<file>buttons/360_Y_unpressed.png</file>
+	<file>buttons/360_Y_disabled.png</file>
+	<file>buttons/360_Start_pressed.png</file>
+	<file>buttons/360_Start_unpressed.png</file>
+	<file>buttons/360_Start_disabled.png</file>
+	<file>buttons/360_Back_pressed.png</file>
+	<file>buttons/360_Back_unpressed.png</file>
+	<file>buttons/360_Back_disabled.png</file>
+	<file>buttons/360_LB_pressed.png</file>
+	<file>buttons/360_LB_unpressed.png</file>
+	<file>buttons/360_LB_disabled.png</file>
+	<file>buttons/360_LT_pressed.png</file>
+	<file>buttons/360_LT_unpressed.png</file>
+	<file>buttons/360_LT_disabled.png</file>
+	<file>buttons/360_RB_pressed.png</file>
+	<file>buttons/360_RB_unpressed.png</file>
+	<file>buttons/360_RB_disabled.png</file>
+	<file>buttons/360_RT_pressed.png</file>
+	<file>buttons/360_RT_unpressed.png</file>
+	<file>buttons/360_RT_disabled.png</file>
+	<file>buttons/360_Left_Stick_Top_layer_pressed.png</file>
+	<file>buttons/360_Left_Stick_Top_layer_unpressed.png</file>
+	<file>buttons/360_Left_Stick_Top_layer_disabled.png</file>
+	<file>buttons/360_Right_Stick_Top_layer_pressed.png</file>
+	<file>buttons/360_Right_Stick_Top_layer_unpressed.png</file>
+	<file>buttons/360_Right_Stick_Top_layer_disabled.png</file>
+	<file>buttons/360_Left_Stick_Bottom_layer.png</file>
+	<file>buttons/360_Right_Stick_Bottom_layer.png</file>
+	<file>buttons/360_Dpad.png</file>
+	<file>buttons/360_Dpad_disabled.png</file>
+	<file>buttons/360_Dpad_Down_unpressed.png</file>
+	<file>buttons/360_Dpad_Down_pressed.png</file>
+	<file>buttons/360_Dpad_Down_disabled.png</file>
+	<file>buttons/360_Dpad_Up_unpressed.png</file>
+	<file>buttons/360_Dpad_Up_pressed.png</file>
+	<file>buttons/360_Dpad_Up_disabled.png</file>
+	<file>buttons/360_Dpad_Left_unpressed.png</file>
+	<file>buttons/360_Dpad_Left_pressed.png</file>
+	<file>buttons/360_Dpad_Left_disabled.png</file>
+	<file>buttons/360_Dpad_Right_unpressed.png</file>
+	<file>buttons/360_Dpad_Right_pressed.png</file>
+	<file>buttons/360_Dpad_Right_disabled.png</file>
+	<file>buttons/logo_pressed.png</file>
+	<file>buttons/logo_unpressed.png</file>
+	<file>buttons/logo_disabled.png</file>
+
     </qresource>
 </RCC>
