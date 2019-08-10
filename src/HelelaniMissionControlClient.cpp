@@ -131,6 +131,10 @@ void HelelaniMissionControlClient::customEvent(QEvent* ev)
         auto aue = static_cast<AnalogUpdateEvent*>(ev);
         helelani_common::Analog& msg = aue->m_msg;
         m_ui.volt12->display(QString::number(msg.voltage_12, 'f', 2));
+	if(m_ui.volt12->intValue() < 8.5)
+		m_ui.volt12->setStyleSheet("""QLCDNumber{color:red;}""");	
+	else if(m_ui.volt12->intValue() < 10)
+		m_ui.volt12->setStyleSheet("""QLCDNumber{color:maroon;}""");
         m_ui.amp12->display(QString::number(msg.current_12, 'f', 2));
         m_ui.volt48->display(QString::number(msg.voltage_48, 'f', 2));
         m_ui.amp24->display(QString::number(msg.current_24, 'f', 2));

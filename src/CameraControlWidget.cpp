@@ -126,3 +126,8 @@ void CameraControlWidget::exposureSliderChanged(int value)
     update();
     doSignal();
 }
+
+void CameraControlWidget::dpadinterp(char dir)
+{
+
+}

@@ -39,11 +39,11 @@ void HeadingWidget::paintEvent(QPaintEvent* ev)
 
     /* Draw components of widget */
     QPainter painter(this);
-    painter.setTransform(scaleDown * backgroundXf);
+    painter.setTransform(scaleDown * backgroundXf / 1.25f);		//Changed by Alec: '/ 1.25f'
     m_renderer.render(&painter, "background");
-    painter.setTransform(scaleDown * compassXf);
+    painter.setTransform(scaleDown * compassXf / 1.25f);		//Changed by Alec: '/ 1.25f'
     m_renderer.render(&painter, "compass");
-    painter.setTransform(scaleDown * foregroundXf);
+    painter.setTransform(scaleDown * foregroundXf / 1.25f);		//Changed by Alec: '/ 1.25f'
     m_renderer.render(&painter, "foreground");
     painter.resetTransform();
 

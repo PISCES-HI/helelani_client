@@ -53,7 +53,7 @@ void HelelaniThrottlePad::driveMove(DriveTrackpad* sender, QMouseEvent* ev)
     float leftMul = std::max(0.f, std::min(1.f - x, 1.f)) * 2.f - 1.f;
     float rightMul = std::max(0.f, std::min(x + 1.f, 1.f)) * 2.f - 1.f;
     changeThrottles(leftMul * -y, rightMul * -y);
-    m_moveDragging = true;
+    m_moveDragging = true;  
 }
 
 void HelelaniThrottlePad::driveRelease(DriveTrackpad* sender, QMouseEvent* ev)

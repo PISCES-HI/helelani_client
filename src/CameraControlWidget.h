@@ -40,6 +40,7 @@ signals:
 public slots:
     void pitchSliderChanged(int value);
     void exposureSliderChanged(int value);
+    void dpadinterp(char dir);
 };
 
 #endif //CAMERACONTROLWIDGET_H

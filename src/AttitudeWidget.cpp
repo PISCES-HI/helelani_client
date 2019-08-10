@@ -45,15 +45,17 @@ void AttitudeWidget::paintEvent(QPaintEvent* ev)
 
     /* Draw components of widget */
     QPainter painter(this);
+    painter.scale(0.8f, 0.8f);					//Tell painter to draw x0.8 the size of the background (Alec)
     painter.setClipRect(horizonclipBounds);
-    painter.setTransform(scaleDown * horizonXf);
+    painter.scale(1.f, 1.f);					//Reset painting scale for other visual layers (Alec)
+    painter.setTransform(scaleDown * horizonXf / 1.25f);	//Changed by Alec: '/ 1.25f'
     m_renderer.render(&painter, "horizon");
     painter.setClipping(false);
-    painter.setTransform(scaleDown * maskXf);
+    painter.setTransform(scaleDown * maskXf / 1.25f);		//Changed by Alec: '/ 1.25f'
     m_renderer.render(&painter, "mask");
-    painter.setTransform(scaleDown * turretXf);
+    painter.setTransform(scaleDown * turretXf / 1.25f);		//Changed by Alec: '/ 1.25f'
     m_renderer.render(&painter, "turret");
-    painter.setTransform(scaleDown * tickdecoXf);
+    painter.setTransform(scaleDown * tickdecoXf / 1.25f);	//Changed by Alec: '/ 1.25f'
     m_renderer.render(&painter, "tickdeco");
     painter.resetTransform();
 

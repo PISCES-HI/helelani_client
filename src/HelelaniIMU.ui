@@ -416,7 +416,8 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>HeadingWidget</class>
+   <class>
+</class>
    <extends>QWidget</extends>
    <header>HeadingWidget.h</header>
    <container>1</container>
